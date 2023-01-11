@@ -1,0 +1,13 @@
+.vs
+.vscode
+bin
+
+python/__pycache__
+scripts/history/*
+
+data/images/*
+data/output/*
+data/next/*
+data/primary.txt
+data/secondary.txt
+data/stereo.txt
