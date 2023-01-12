@@ -58,13 +58,13 @@ void Calibrate::clearData(){
     FileStorage fs(_conf.storage_path + "/calib_data.xml", FileStorage::WRITE);
     fs.release();
 
-    ofstream fout(_conf.storage_path + "/primary.txt",ios::out);
+    ofstream fout(_conf.storage_path + "/output/primary.txt",ios::out);
     fout.close();
 
     if(_conf.second_camera_index >= -1){
-        ofstream fout2(_conf.storage_path + "/secondary.txt",ios::out);
+        ofstream fout2(_conf.storage_path + "/output/secondary.txt",ios::out);
         fout2.close();
-        ofstream fout3(_conf.storage_path + "/stereo.txt",ios::out);
+        ofstream fout3(_conf.storage_path + "/output/stereo.txt",ios::out);
         fout3.close();
     }
 }

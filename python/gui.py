@@ -1,5 +1,9 @@
 from python.storage import *
 from python.impl import *
+from python.plot import f_plot
+from python.log import logging
+
+import sys
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QRadioButton, QPushButton, QCheckBox, QLabel
 mode = 'elas'
@@ -30,6 +34,7 @@ def show_gui():
 
     plot_btn = QPushButton("Plot",window)
     plot_btn.setGeometry(220,60,160,50)
+    plot_btn.clicked.connect(f_plot)
     
     clear_btn = QPushButton("Clear",window)
     clear_btn.setGeometry(40,130,160,50)
@@ -93,9 +98,9 @@ def show_wait(func,msg):
     tool_label = QLabel(str(msg),window)
     tool_label.move(40,30)
     window.show()
-    print(msg)
+    logging.info('%s',msg)
 
     func()
-
-    app.exit()
+    
+    app.quit()
 

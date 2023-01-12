@@ -113,17 +113,17 @@ bool Camera::cornerMatch(double range){
 void Capture::listCamera(){
     vector<string> list;
     int count = _listDevice(list);
-    logging.info("%d divices detected:\n",count);
+    logging.info("%d devices detected:\n",count);
     for(int i = 0; i < list.size(); i++)
         logging.info("  index: %d, model: %s\n",i,list[i].c_str());
 }
 
 
 /**
- * @brief list connected divices
+ * @brief list connected devices
  * 
  * @param list 
- * @return int number of divices
+ * @return int number of devices
  */
 int Capture::_listDevice(vector<string>& list){
     ICreateDevEnum *pDevEnum = NULL;

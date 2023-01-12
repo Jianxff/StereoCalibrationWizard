@@ -55,27 +55,28 @@ class Capture{
     int     _listDevice(std::vector<std::string>&);
 public:
     enum CAP_FLAG{
-        DETECT      = 1 << 0,
-        NEXTPOSE    = 1 << 1,
-        SAVE_IMAGE  = 1 << 2,
-        MULTI_CAP   = 1 << 3,
-        INIT_CAP    = 1 << 4,
-        NOT_SHOW    = 1 << 5,
-        NOT_CLOSE   = 1 << 6
+        DETECT          = 1 << 0,
+        NEXTPOSE        = 1 << 1,
+        SAVE_IMAGE      = 1 << 2,
+        MULTI_CAP       = 1 << 3,
+        INIT_CAP        = 1 << 4,
+        NOT_SHOW        = 1 << 5,
+        NOT_CLOSE       = 1 << 6,
+        MEASURE_MODE    = 1 << 7
     };
     int     count;                      // image count
 
     Capture();
     Capture(Config&);
     void    listCamera();
-    int     readCount();
-    void    writeCount(int count_input = -1);
+    int     readCount(bool measure_mode = false);
+    void    writeCount(int count_input = -1, bool measure_mode = false);
 
     void    openCamera();
     int     importImage(cv::Mat* frame_main = nullptr,cv::Mat* frame_second = nullptr);
     int     captureImage(int flag,cv::Mat* frame_main = nullptr,cv::Mat* frame_second = nullptr);
     int     captureImageRT(cv::Mat* frame_main = nullptr,cv::Mat* frame_second = nullptr);
-    void    storeImage(bool save_file,cv::Mat* frame_main = nullptr,cv::Mat* frame_second = nullptr);
+    void    storeImage(int save_flag,cv::Mat* frame_main = nullptr,cv::Mat* frame_second = nullptr);
 
 };
 

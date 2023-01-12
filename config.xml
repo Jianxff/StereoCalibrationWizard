@@ -2,15 +2,19 @@
 <opencv_storage>
     <storage_path>"../data"</storage_path>
     
-    <chessboard_width>8</chessboard_width>
-    <chessboard_height>11</chessboard_height>
-    <chessboard_square_size>25</chessboard_square_size>
+    <chessboard_width>8</chessboard_width>                  <!-- 棋盘格内角点数量/宽边 -->
+    <chessboard_height>11</chessboard_height>               <!-- 棋盘格内角点数量/长边 -->
+    <chessboard_square_size>25</chessboard_square_size>     <!-- 棋盘格方格边长/毫米 -->
 
-    <image_width>640</image_width>
+    <!-- 捕获画面长宽/像素 -->
+    <image_width>640</image_width>      
     <image_height>480</image_height>
 
+    <!-- 大于等于0: 设备id | -1: 从文件导入 | -2: 禁用-->
     <main_camera_index>2</main_camera_index>
     <second_camera_index>0</second_camera_index>
+    
+    <!-- 自动捕获: 实际画面数值与引导数值的差值范围 --> 
     <auto_capture_range>5.0</auto_capture_range>
 
     <flag_fix_aspect_ratio>1</flag_fix_aspect_ratio>
@@ -19,34 +23,33 @@
     <flag_fix_k1>0</flag_fix_k1>
     <flag_fix_k2>0</flag_fix_k2>
 
-
+    <!-- disparity methods settings-->
     <elas>
-        <disp_min>0</disp_min>  <!--0 最小视差-->
-        <disp_max>144</disp_max> <!--255 最大视差 -->
-        <support_threshold>0.95</support_threshold> <!--0.95 比率测试：最低match VS 次低match -->
-        <support_texture>10</support_texture> <!--10 支持点的最小纹理 -->
-        <candidate_stepsize>5</candidate_stepsize> <!--5 用于支持点的sobel特征匹配的邻域半径 -->
-        <incon_window_size>5</incon_window_size> <!--5 不连续性窗口的尺寸 -->
-        <incon_threshold>5</incon_threshold> <!--5 不连续性窗口内的视差范围阈值 -->
-        <incon_min_support>5</incon_min_support> <!--5 不连续性窗口内的最低支持点数量 -->
-        <add_corners>1</add_corners> <!--1 是否添加角点 -->
-        <grid_size>25</grid_size> <!--20 网格尺寸 -->
-        <beta>0.02</beta> <!--0.02 图像相似性度量的参数 -->
-        <gamma>5</gamma>  <!--5 先验概率常数 -->
-        <sigma>1</sigma> <!--1 先验概率的标准差 -->
-        <sradius>3</sradius> <!--3 标准差半径 -->
-        <match_texture>0</match_texture> <!--0 最低纹理 -->
-        <lr_threshold>2</lr_threshold> <!--2 左右一致性检验阈值 -->
-        <speckle_sim_threshold>1</speckle_sim_threshold> <!--1 连通域判断阈值 -->
-        <speckle_size>100</speckle_size> <!--200 连通域噪声尺寸判断阈值 -->
-        <ipol_gap_width>2000</ipol_gap_width> <!--5000 空洞宽 -->
-        <filter_median>1</filter_median> <!--1 是否中值滤波  -->
-        <filter_adaptive_mean>0</filter_adaptive_mean> <!--0 是否自适应中值滤波 -->
-        <postprocess_only_left>0</postprocess_only_left> <!--0 是否只对左视差图后处理，设置为True可以节省时间 -->
-        <subsampling>0</subsampling> <!--0 每个两个像素进行视差计算，设置为True可以节省时间，但是传入的D1和D2的分辨率必须为(w/2) x (h/2) -->
+        <disp_min>0</disp_min>                              <!--0    最小视差-->
+        <disp_max>144</disp_max>                            <!--255  最大视差 -->
+        <support_threshold>0.95</support_threshold>         <!--0.95 比率测试：最低match VS 次低match -->
+        <support_texture>10</support_texture>               <!--10   支持点的最小纹理 -->
+        <candidate_stepsize>5</candidate_stepsize>          <!--5    用于支持点的sobel特征匹配的邻域半径 -->
+        <incon_window_size>5</incon_window_size>            <!--5    不连续性窗口的尺寸 -->
+        <incon_threshold>5</incon_threshold>                <!--5    不连续性窗口内的视差范围阈值 -->
+        <incon_min_support>5</incon_min_support>            <!--5    不连续性窗口内的最低支持点数量 -->
+        <add_corners>1</add_corners>                        <!--1    是否添加角点 -->
+        <grid_size>25</grid_size>                           <!--20   网格尺寸 -->
+        <beta>0.02</beta>                                   <!--0.02 图像相似性度量的参数 -->
+        <gamma>5</gamma>                                    <!--5    先验概率常数 -->
+        <sigma>1</sigma>                                    <!--1    先验概率的标准差 -->
+        <sradius>3</sradius>                                <!--3    标准差半径 -->
+        <match_texture>0</match_texture>                    <!--0    最低纹理 -->
+        <lr_threshold>2</lr_threshold>                      <!--2    左右一致性检验阈值 -->
+        <speckle_sim_threshold>1</speckle_sim_threshold>    <!--1    连通域判断阈值 -->
+        <speckle_size>100</speckle_size>                    <!--200  连通域噪声尺寸判断阈值 -->
+        <ipol_gap_width>2000</ipol_gap_width>               <!--5000 空洞宽 -->
+        <filter_median>1</filter_median>                    <!--1    是否中值滤波  -->
+        <filter_adaptive_mean>0</filter_adaptive_mean>      <!--0    是否自适应中值滤波 -->
+        <postprocess_only_left>0</postprocess_only_left>    <!--0    是否只对左视差图后处理，设置为True可以节省时间 -->
+        <subsampling>0</subsampling>                        <!--0    每个两个像素进行视差计算，设置为True可以节省时间，但是传入的D1和D2的分辨率必须为(w/2) x (h/2) -->
     </elas>
 
-    
     <sgbm>
         <mode>8</mode>
         <pre_filter_cap>15</pre_filter_cap>

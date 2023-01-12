@@ -16,6 +16,9 @@ Capture::Capture(Config& c){
 }
 
 void Capture::openCamera(){
+    if(_conf.main_camera_index <= -1 || _conf.second_camera_index <= -1)
+        return;
+    
     for(auto& cam : _camera_list){
         string tag = cam.primary ? "primary" : "secondary";
         if(!cam.init(_conf.image_size, _conf.board_size))
@@ -95,11 +98,14 @@ int Capture::captureImageRT(Mat* frame_main,Mat* frame_second){
 }
 
 int Capture::importImage(Mat* frame_main,Mat* frame_second){
-    readCount();
-    _count_cyc = (_count_cyc + 1) % count;
+    readCount(true);
+    if(count == 0)
+        logging.critical(-1,"no input images\n");
+
+    _count_cyc = _count_cyc % count + 1;
     for(auto& cam : _camera_list){
         string tag = cam.primary ? "primary(" : "secondary(";
-        string path = "/images/" + tag + to_string(_count_cyc) + ").jpg";
+        string path = "/input/" + tag + to_string(_count_cyc) + ").jpg";
         cam.importFrame((_conf.storage_path + path).c_str());
     }
     if(frame_main != nullptr)   _camera_list[0].frame_bak.copyTo(*frame_main);
@@ -135,8 +141,9 @@ int Capture::captureImage(int flag,Mat* frame_main,Mat* frame_second){
 
         if(available && (key == KEY_SPACE || match)){
             count++;
-            storeImage((flag & SAVE_IMAGE),frame_main,frame_second);
-            writeCount();
+            storeImage(flag,frame_main,frame_second);
+            if(flag & MEASURE_MODE)
+                writeCount(-1,true);
             logging.info("successfully captured image with index %d\n",count);
             if(!(flag & MULTI_CAP)){
                 key = KEY_SPACE;
@@ -154,17 +161,19 @@ int Capture::captureImage(int flag,Mat* frame_main,Mat* frame_second){
 }
 
 
-void Capture::storeImage(bool save_file, Mat* frame_main,Mat* frame_second){
-    if(save_file){
-        string filepath = _conf.storage_path + "/images/primary(" + to_string(count) + ").jpg";
+void Capture::storeImage(int flag, Mat* frame_main,Mat* frame_second){
+    if(flag & SAVE_IMAGE){
+        string fold = (flag & MEASURE_MODE) ?  "/input" : "/images";
+        string filepath = _conf.storage_path + fold + "/primary(" + to_string(count) + ").jpg";
         imwrite(filepath, _camera_list[0].frame_bak);
     }
     if(frame_main != nullptr)   _camera_list[0].frame_bak.copyTo(*frame_main);
 
     // for secondary camera
     if(_conf.second_camera_index < -1)  return;
-    if(save_file){
-        string filepath = _conf.storage_path + "/images/secondary(" + to_string(count) + ").jpg";
+    if(flag & SAVE_IMAGE){
+        string fold = (flag & MEASURE_MODE) ?  "/input" : "/images";
+        string filepath = _conf.storage_path + fold + "/secondary(" + to_string(count) + ").jpg";
         imwrite(filepath, _camera_list[1].frame_bak);
     }
     if(frame_second != nullptr) _camera_list[1].frame_bak.copyTo(*frame_second);
@@ -172,17 +181,19 @@ void Capture::storeImage(bool save_file, Mat* frame_main,Mat* frame_second){
 }
 
 
-int Capture::readCount(){
-    ifstream fin(_conf.storage_path + "/images/count.txt", ios::in);
+int Capture::readCount(bool measure_mode){
+    string fold = measure_mode ? "/input/count.txt" : "/images/count.txt";
+    ifstream fin(_conf.storage_path + fold, ios::in);
     if(!fin.is_open())  count = 0;
     else                fin >> count;
     fin.close();
     return count;
 }
 
-void Capture::writeCount(int count_input){
+void Capture::writeCount(int count_input, bool measure_mode){
+    string fold = measure_mode ? "/input/count.txt" : "/images/count.txt";
     if(count_input >= 0) count = count_input;
-    ofstream fout(_conf.storage_path + "/images/count.txt", ios::out);
+    ofstream fout(_conf.storage_path + fold, ios::out);
     fout << count;
     fout.close();
 }

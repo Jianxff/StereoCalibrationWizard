@@ -7,16 +7,18 @@ int measure(int mode){
     Capture cap(conf);
     Calibrate calib(conf);
     calib.importData(0);
-
     Measure ms(conf);
     
 
     cap.openCamera();
     ms.init(mode);
-    
+
+    cap.readCount(true);
     int key = 0;
     for(;key != KEY_ESC;){
-        cap.captureImage(cap.SAVE_IMAGE,&ms._frameL,&ms._frameR);
+        int res = cap.captureImage(cap.SAVE_IMAGE | cap.MEASURE_MODE,&ms._frameL,&ms._frameR);
+        if(res == 1)
+            break;
         calib.stereoRectify(&ms._frameL, &ms._frameR);
         key = 0;
         ms.showEpi();

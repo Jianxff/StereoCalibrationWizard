@@ -8,6 +8,6 @@ scripts/history/*
 data/images/*
 data/output/*
 data/next/*
-data/primary.txt
-data/secondary.txt
-data/stereo.txt
+data/input/*
+data/calib_data.xml
+data/calib_record.jpg
