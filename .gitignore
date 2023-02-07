@@ -4,10 +4,12 @@ bin
 
 python/__pycache__
 scripts/history/*
+scripts/match
 
 data/images/*
 data/output/*
 data/next/*
+data/match/*
 data/input/*
 data/calib_data.xml
 data/calib_record.jpg

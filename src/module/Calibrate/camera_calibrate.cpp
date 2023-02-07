@@ -132,7 +132,7 @@ double Calibrate::_cameraCalibrate(CameraData& data){
     data.rms = calibrateCamera(data._object_buf, data.chessboard_buf, _conf.image_size,
                             data.camera_matrix, data.dist_coeffs,
                             data.R_vec, data.T_vec,
-                            _conf.calib_flag | CALIB_FIX_K3 | CALIB_FIX_K4 | CALIB_FIX_K5
+                            _conf.calib_flag | CALIB_FIX_K5
                             );
     bool valid = checkRange(data.camera_matrix) && checkRange(data.dist_coeffs);
     if(!valid){

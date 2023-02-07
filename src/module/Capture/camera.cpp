@@ -12,28 +12,45 @@ Camera::Camera(int index,bool primary){
     frame = Mat();
 }
 
-bool Camera::init(Size s,Size board_size){
-    this->board_size = board_size;
-    if(board_size.width > 0 && board_size.height > 0){
+bool Camera::init(Config& c){
+    _conf = c;
+    if(c.board_size.width > 0 && c.board_size.height > 0){
         corner_index[0] = 0;
-        corner_index[1] = board_size.width - 1;
-        corner_index[2] = board_size.width * (board_size.height - 1);
-        corner_index[3] = board_size.width * board_size.height - 1;
+        corner_index[1] = c.board_size.width - 1;
+        corner_index[2] = c.board_size.width * (c.board_size.height - 1);
+        corner_index[3] = c.board_size.width * c.board_size.height - 1;
     }
     
     if(index == -1)
         return false;
+    if(!primary && c.dual_sync){
+        sync = true;
+        return true;
+    }
+    
     cap = new VideoCapture(index);
-    cap->set(CAP_PROP_FRAME_WIDTH, s.width);
-    cap->set(CAP_PROP_FRAME_HEIGHT, s.height);
+    int width = c.dual_sync ? c.image_size.width * 2 : c.image_size.width;
+    cap->set(CAP_PROP_FRAME_WIDTH, width);
+    cap->set(CAP_PROP_FRAME_HEIGHT,c.image_size.height);
+    cap->set(CAP_PROP_FPS,60);
+    // cap->get(CAP_PROP_FOURCC);
+    if(c.mjpg)  cap->set(CAP_PROP_FOURCC,VideoWriter::fourcc('M', 'J', 'P', 'G'));
+    else        cap->set(CAP_PROP_FOURCC,VideoWriter::fourcc('Y', 'U', 'Y', '2'));
+
+    if(c.manual)
+        cap->set(CAP_PROP_SETTINGS,1);
 
     return cap->isOpened();
 }
 
 
 void Camera::captureFrame(){
+    if(cap == nullptr)
+        return;
     (*cap) >> frame;
-    frame.copyTo(frame_bak);
+    
+    // cvtColor(frame,frame,CV_YCrCb2BGR);
+    // frame.copyTo(frame_bak);
 }
 
 void Camera::importFrame(const char* filepath){
@@ -42,10 +59,10 @@ void Camera::importFrame(const char* filepath){
 }
 
 bool Camera::chessboardDetect(){
-    bool found = cv::findChessboardCorners(frame_bak,board_size,_chessboard_buf,
+    bool found = cv::findChessboardCorners(frame_bak,_conf.board_size,_chessboard_buf,
                                             cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_ADAPTIVE_THRESH |
                                             cv::CALIB_CB_FILTER_QUADS);
-    drawChessboardCorners(frame,board_size,_chessboard_buf,found);
+    drawChessboardCorners(frame,_conf.board_size,_chessboard_buf,found);
     if(found){
         Mat frame_gray;
         cvtColor(frame_bak,frame_gray,COLOR_RGB2GRAY);

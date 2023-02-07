@@ -21,11 +21,14 @@ void Config::import(const char* filepath){
     fs["chessboard_square_size"] >> square_size;
     fs["image_width"] >> image_size.width;
     fs["image_height"] >> image_size.height;
+    fs["manual_settings"] >> manual;
+    fs["compress_mjpg"] >> mjpg;
 
     fs["main_camera_index"] >> main_camera_index;
     fs["second_camera_index"] >> second_camera_index;
 
     fs["auto_capture_range"] >> auto_capture_range;
+    fs["free_cap_num"] >>  free_cap_num;
 
     fs["flag_fix_aspect_ratio"] >> fix_aspect_ratio;
     fs["flag_zero_tangent_dist"] >> zero_tangent_dist;
@@ -38,6 +41,9 @@ void Config::import(const char* filepath){
     if(fix_aspect_ratio)    calib_flag |= CALIB_FIX_ASPECT_RATIO;
     if(fix_k1)              calib_flag |= CALIB_FIX_K1;
     if(fix_k2)              calib_flag |= CALIB_FIX_K2;
+
+    if(main_camera_index == second_camera_index)
+        dual_sync = true;
 
     fs.release();
 }

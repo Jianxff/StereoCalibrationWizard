@@ -6,16 +6,20 @@ from python.log import logging
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget
 from PyQt5.QtWidgets import QRadioButton, QPushButton, QCheckBox, QLabel
-mode = 'elas'
+mode = 0
 rt = False
 
 def set_elas():
     global mode
-    mode = 'elas'
+    mode = 0
 
 def set_sgbm():
     global mode
-    mode = 'sgbm'
+    mode = 1
+
+def set_adcensus():
+    global mode
+    mode = 2
 
 def set_rt(set):
     global rt
@@ -82,8 +86,12 @@ def show_gui():
     r_btn2.move(50, 570)
     r_btn2.toggled.connect(lambda x : set_sgbm() if x else None)
 
+    r_btn3 = QRadioButton("AD-Census", window)
+    r_btn3.move(220, 530)
+    r_btn3.toggled.connect(lambda x : set_adcensus() if x else None) 
+
     c_btn = QCheckBox("RealTime",window)
-    c_btn.move(230,530)
+    c_btn.move(220,570)
     c_btn.stateChanged.connect(lambda x : set_rt(x))
     
     window.show()

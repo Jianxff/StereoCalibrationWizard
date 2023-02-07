@@ -44,6 +44,7 @@ end
 % can be found in the paper
 function y = ang2cornerness(x)
     y = 1404.50760.*x.^2 - 49.2631560 .* x.^3 + 0.94482.*x.^4 - 0.0093798 .* x.^5 + 0.0000455668.*x.^6 - 8.6160*1e-8.* x.^7;
+
 end
 
 end

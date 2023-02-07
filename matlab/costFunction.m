@@ -26,7 +26,6 @@ function out = costFunction(par,corners,config,cdata,sdata)
     
     objects = zeros(3,2);
     P = zeros(2,board_width * board_height,2);
-    epi_err = 0;
     
     % Verify if all the points fall inside the image plane after projection
     for i = 1 : board_height
@@ -47,17 +46,18 @@ function out = costFunction(par,corners,config,cdata,sdata)
                 end
             end
     
-            if length(cdata) == 2
-                % epi error
-                EpiLine = sdata.F * ([P(1,pos,1), P(2,pos,1), 1]');
-                Dist = ([P(1,pos,2), P(2,pos,2), 1] * EpiLine)^2 / (EpiLine(1) ^ 2 + EpiLine(2) ^ 2);
-                epi_err = epi_err + Dist;
-            end
+            % if length(cdata) == 2
+            %     % epi error
+            %     EpiLine = sdata.F * ([P(1,pos,1), P(2,pos,1), 1]');
+            %     Dist = ([P(1,pos,2), P(2,pos,2), 1] * EpiLine)^2 / (EpiLine(1) ^ 2 + EpiLine(2) ^ 2);
+            %     epi_err = epi_err + Dist;
+            % end
         end
     end
     
-    avg_epi_err = sqrt(epi_err / (board_height * board_width));
+    % avg_epi_err = sqrt(epi_err / (board_height * board_width));
     
+    % out_of_range check
     for i = 1 : 4
         for j = 1 : length(cdata)
             % one corner point should not be to close to the three neighbor ones
@@ -71,9 +71,22 @@ function out = costFunction(par,corners,config,cdata,sdata)
     end
     
     tr = traceCount(corners,P,R,t,config,cdata,sdata);
-    % fprintf(1,'tr: %.4f, epi: %.4f\n',tr,avg_epi_err);
-    if length(cdata) == 2
-        out = tr * avg_epi_err;
-    else
-        out = tr;
+
+    % relatice_dist count
+    min_dist = realmax;
+    for i = 1 : length(cdata(1).T)
+        new_dist = distCount(t,cdata(1).T(:,i));
+        if new_dist < min_dist
+            min_dist = new_dist;
+        end
     end
+
+    out = tr + 3600 / min_dist.^2;
+    % fprintf(1,'tr: %.4f, dist: %.4f, out: %.4f\n',tr,min_dist,out);
+
+    % fprintf(1,'tr: %.4f, epi: %.4f\n',tr,avg_epi_err);
+    % if length(cdata) == 2
+    %     out = tr * avg_epi_err;
+    % else
+    %     out = tr;
+    % end

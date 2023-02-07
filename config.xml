@@ -4,18 +4,23 @@
     
     <chessboard_width>8</chessboard_width>                  <!-- 棋盘格内角点数量/宽边 -->
     <chessboard_height>11</chessboard_height>               <!-- 棋盘格内角点数量/长边 -->
-    <chessboard_square_size>25</chessboard_square_size>     <!-- 棋盘格方格边长/毫米 -->
+    <chessboard_square_size>15</chessboard_square_size>     <!-- 棋盘格方格边长/毫米 -->
 
     <!-- 捕获画面长宽/像素 -->
     <image_width>640</image_width>      
     <image_height>480</image_height>
+    <!-- 手动调参 -->
+    <manual_settings>0</manual_settings>
+    <!-- MJPG 压缩 -->
+    <compress_mjpg>0</compress_mjpg>
 
     <!-- 大于等于0: 设备id | -1: 从文件导入 | -2: 禁用-->
-    <main_camera_index>2</main_camera_index>
-    <second_camera_index>0</second_camera_index>
+    <main_camera_index>1</main_camera_index>
+    <second_camera_index>1</second_camera_index>
     
     <!-- 自动捕获: 实际画面数值与引导数值的差值范围 --> 
     <auto_capture_range>5.0</auto_capture_range>
+    <free_cap_num>30</free_cap_num>
 
     <flag_fix_aspect_ratio>1</flag_fix_aspect_ratio>
     <flag_zero_tangent_dist>1</flag_zero_tangent_dist>
@@ -23,13 +28,16 @@
     <flag_fix_k1>0</flag_fix_k1>
     <flag_fix_k2>0</flag_fix_k2>
 
+    <!-- match points select -->
+    <select_points></select_points>
+
     <!-- disparity methods settings-->
     <elas>
         <disp_min>0</disp_min>                              <!--0    最小视差-->
-        <disp_max>144</disp_max>                            <!--255  最大视差 -->
+        <disp_max>255</disp_max>                            <!--255  最大视差 -->
         <support_threshold>0.95</support_threshold>         <!--0.95 比率测试：最低match VS 次低match -->
-        <support_texture>10</support_texture>               <!--10   支持点的最小纹理 -->
-        <candidate_stepsize>5</candidate_stepsize>          <!--5    用于支持点的sobel特征匹配的邻域半径 -->
+        <support_texture>32</support_texture>               <!--10   支持点的最小纹理 -->
+        <candidate_stepsize>1</candidate_stepsize>          <!--5    用于支持点的sobel特征匹配的邻域半径 -->
         <incon_window_size>5</incon_window_size>            <!--5    不连续性窗口的尺寸 -->
         <incon_threshold>5</incon_threshold>                <!--5    不连续性窗口内的视差范围阈值 -->
         <incon_min_support>5</incon_min_support>            <!--5    不连续性窗口内的最低支持点数量 -->
@@ -42,8 +50,8 @@
         <match_texture>0</match_texture>                    <!--0    最低纹理 -->
         <lr_threshold>2</lr_threshold>                      <!--2    左右一致性检验阈值 -->
         <speckle_sim_threshold>1</speckle_sim_threshold>    <!--1    连通域判断阈值 -->
-        <speckle_size>100</speckle_size>                    <!--200  连通域噪声尺寸判断阈值 -->
-        <ipol_gap_width>2000</ipol_gap_width>               <!--5000 空洞宽 -->
+        <speckle_size>200</speckle_size>                    <!--200  连通域噪声尺寸判断阈值 -->
+        <ipol_gap_width>3000</ipol_gap_width>               <!--5000 空洞宽 -->
         <filter_median>1</filter_median>                    <!--1    是否中值滤波  -->
         <filter_adaptive_mean>0</filter_adaptive_mean>      <!--0    是否自适应中值滤波 -->
         <postprocess_only_left>0</postprocess_only_left>    <!--0    是否只对左视差图后处理，设置为True可以节省时间 -->
@@ -53,15 +61,24 @@
     <sgbm>
         <mode>8</mode>
         <pre_filter_cap>15</pre_filter_cap>
-        <min_disparity>4</min_disparity>
-        <num_disparity>96</num_disparity>
-        <sad_window_size>8</sad_window_size>
-        <uniqueness_ratio>1</uniqueness_ratio>
-        <p1_num>4</p1_num>
-        <p2_num>32</p2_num>
-        <speckle_range>32</speckle_range>
-        <speckle_window_size>100</speckle_window_size>
-        <disp_max_diff>16</disp_max_diff>
-        <fill_blank>0</fill_blank>
+        <min_disparity>11</min_disparity>                   <!--0 -->
+        <num_disparity>111</num_disparity>                  <!--96 -->
+        <sad_window_size>4</sad_window_size>                <!--8 -->
+        <uniqueness_ratio>1</uniqueness_ratio>              <!--1 -->
+        <p1_num>7</p1_num>                                  <!--4 -->
+        <p2_num>100</p2_num>                                <!--32 -->
+        <speckle_range>32</speckle_range>                   <!--32 -->
+        <speckle_window_size>100</speckle_window_size>      <!--100 -->
+        <disp_max_diff>100</disp_max_diff>                  <!--16 -->
+        <fill_blank>0</fill_blank>                          <!--0 -->
     </sgbm>
+
+    <adcensus>
+        <min_disparity>0</min_disparity>
+        <max_disparity>96</max_disparity>
+        <lrcheck_thres>1</lrcheck_thres>
+        <do_lrcheck>1</do_lrcheck>
+        <do_filling>1</do_filling>
+    </adcensus>
+
 </opencv_storage>

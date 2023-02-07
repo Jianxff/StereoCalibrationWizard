@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup as BS
 import matplotlib.pyplot as plt
 from python.log import logging
 
-def f_plot():
-    plot_data(read_data())
+def f_plot(show = True):
+    plot_data(read_data(),show)
 
 def read_data():
     try:
@@ -26,6 +26,7 @@ def read_data():
         logging.critical('calib-data damaged or lost')
         return None
     
+    record['rms_ste'] = list(map(float,doc.find('rms_ste').text.split()))
     record['rms'] = list(map(float,doc.find('rms').text.split()))
     record['epi'] = list(map(float,doc.find('epi').text.split())) if doc.find('epi') != None else None
     
@@ -44,7 +45,7 @@ def read_data():
     return record
 
 
-def plot_data(data = None):
+def plot_data(data = None,show = True):
     if data == None:
         return
 
@@ -56,8 +57,10 @@ def plot_data(data = None):
     axes[0,0].set(title='mean - rms/epi')
     axes[0,0].plot(x,data['rms'],label='rms',color='red')
     if data['epi'] != None:
-        ax = axes[0,0,].twinx()
+        ax = axes[0,0].twinx()
         ax.plot(x,data['epi'],label='epi',color='green',linestyle=':')
+    if data['rms_ste'] != None:
+        axes[0,0].plot(x,data['rms_ste'],label='ste',color='orange',linestyle='-.')
     axes[0,0].legend(loc='best')
 
     for pic,key in [(axes[0,1],'F'),(axes[1,0],'K1'),(axes[1,1],'K2')]:
@@ -68,4 +71,6 @@ def plot_data(data = None):
         pic.legend(loc='best')
     
     plt.savefig('data/calib_record.jpg',dpi= 300)
-    plt.show()
+    if show:
+        plt.show()
+    plt.close('all')

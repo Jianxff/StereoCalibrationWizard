@@ -1,4 +1,59 @@
 # Stereo Calibration Wizard #
+
+![avatar](https://badgen.net/badge/Language/C++17/green)
+![stars](https://badgen.net/badge/Env./windows/blue)
+![stars](https://badgen.net/badge/Lab./opencv4/orange)
+
+## INTRO ##
+  **DUAL-cameras** clibration wizard by estimating the **best next position** of the chessboard, which can decrease the reprojection error on calibtion and gain higher rate of convergence for camera parameters.
+
+## FEATURE ##
+- **number of pictures**
+  The calibration result by taking 3 free-capture images and several guiance images (4 or more) is as good as (even better) that by taking 30 or more free-capture images.
+
+- **calibration time**
+  Calibration with guidance will cost fewer time than take losts of free-capture images. 
+
+- **fault-tolerance**
+  Calibration with guidance has higher rate of fault-tolerace. You may take bad images without consious when free capturing, but it won't happen when using guidance, which support better next position and is also easy to roll-back. 
+
+- **evaluation**
+  Calibration result will be evaluated by reprojection errors and measurement result (measuring items in real world). 
+
+## UPDATE ##
+**ON UPDATING ..**
+
+**2023/2/7**
+  - **C++**
+    - sync-frame camera supported
+    - add argument parser
+  - **Matlab** 
+    - `cost_function` modify with same-position weight on output
+    - pso `lower_bound` and `upper_bound` adjust to improve calc speed
+
+**2023/2/4**
+  - **C++**
+    - calibrate roll-back supported by putting number of free-capture images at the second row on `data/images/count.txt`
+
+**OLDER**
+  - **C++**
+    - coding modularization with *`config`*,*`capture`*,*`calibrate`*,*`measurement`*,*`utils`*
+    - single/double camera(s) supported
+    - read config infomation from *`config.xml`*
+    - recorded history calibrate data by *`data/calib_data.xml`*
+    - measurement function with stereo-match algorithm *`ELAS`*,*`SGBM`*,*`AD-Census`*
+    - measurement function with dynamic toolbar
+  - **Matlab**
+    - single/double camera(s) supported
+    - pso/sa optimization algorithm
+    - using jacobian and matrix operation to estimate and evalute the position 
+    - autocorrelation matrix to estimate chessboard corners
+  - **Python**
+    - plot calibration data results/records by `matplotlib` 
+    - uniformly call `C++ program` and `matlab engine`
+    - simple gui based on `PyQt5`
+    - log info with `logging`
+
 <!-- # Calibration Wizard
 [**Paper**](http://openaccess.thecvf.com/content_ICCV_2019/papers/Peng_Calibration_Wizard_A_Guidance_System_for_Camera_Calibration_Based_on_ICCV_2019_paper.pdf) | [**Video**](https://www.youtube.com/watch?v=my3jocjpD0U&feature=youtu.be&t=398) <br>
 <img src="https://pengsongyou.github.io/media/wizard0.jpg" width="270"/> <img src="https://pengsongyou.github.io/media/wizard1.jpg" width="270"/> <img src="https://pengsongyou.github.io/media/wizard2.jpg" width="270"/>

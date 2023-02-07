@@ -29,6 +29,7 @@ public:
     cv::Mat R1_mat, R2_mat, P1_mat, P2_mat;
     cv::Mat Q_mat;
     double rms;
+    double rms_ste;
     double epi_error;
 };
 
@@ -46,6 +47,7 @@ public:
     StereoData                  sdata;
 
     std::vector<double>         rms_record;
+    std::vector<double>         rms_record_ste;
     std::vector<double>         epi_record;
     
     Calibrate(Config&);
@@ -55,7 +57,7 @@ public:
     bool    readImage(int count);       
     double  cameraCalibrate();
     double  stereoCalibrate();
-    void    stereoRectify(cv::Mat* frameL = nullptr, cv::Mat* frameR = nullptr,
+    void    stereoRectify(cv::Mat& frameL, cv::Mat& frameR, bool to_file = false,
                         cv::Mat* outframeL = nullptr, cv::Mat* outframeR = nullptr);
     void    storeData();
 };

@@ -8,25 +8,31 @@ int measure(int mode){
     Calibrate calib(conf);
     calib.importData(0);
     Measure ms(conf);
+    ms.readPoints();
     
-
     cap.openCamera();
     ms.init(mode);
 
-    cap.readCount(true);
     int key = 0;
     for(;key != KEY_ESC;){
-        int res = cap.captureImage(cap.SAVE_IMAGE | cap.MEASURE_MODE,&ms._frameL,&ms._frameR);
+        int res = cap.captureImage(cap.SAVE_IMAGE | cap.MATCH_MODE, &ms._frameL, &ms._frameR);
         if(res == 1)
             break;
-        calib.stereoRectify(&ms._frameL, &ms._frameR);
+        calib.stereoRectify(ms._frameL, ms._frameR);
         key = 0;
         ms.showEpi();
-        cv::waitKey();
+
+        if(cv::waitKey() == KEY_ESC)    break;
+        
         key = 0;
+        if(mode == Measure::ADCensus)
+            ms.compute(calib.sdata.Q_mat);
+
         for(;key != KEY_SPACE && key != KEY_ESC;){
             key = cv::waitKey(5);
-            ms.compute(calib.sdata.Q_mat);
+            if(mode != Measure::ADCensus)
+                ms.compute(calib.sdata.Q_mat);
+                
             ms.drawDist();
             ms.showMeasure();
         }
@@ -44,6 +50,9 @@ int measure(int mode){
  * @return int 
  */
 int measureRT(int mode){
+    if(mode == Measure::ADCensus)
+        logging.critical(-1,"Real-Time mode isn't supported with AD-Census algorithm");
+    
     logging.info("real-time measure function\n");
 
     Config conf("../config.xml");
@@ -52,14 +61,15 @@ int measureRT(int mode){
     calib.importData(0);
 
     Measure ms(conf);
+    ms.readPoints();
     ms.init(mode);
-
     cap.openCamera();
+
     int key = 0;
     for(;key != KEY_ESC;){
         key = cv::waitKey(5);
         cap.captureImageRT(&ms._frameL,&ms._frameR);
-        calib.stereoRectify(&ms._frameL, &ms._frameR);
+        calib.stereoRectify(ms._frameL, ms._frameR);
 
         ms.compute(calib.sdata.Q_mat);
         ms.drawDist();

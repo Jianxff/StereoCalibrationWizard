@@ -10,7 +10,7 @@
 void    listCamera();
 int     initCalibrate();
 int     nextCalibrate();
-int     freeCalibrate(int total = 30);
+int     freeCalibrate(int total = 50);
 int     measure(int mode = Measure::ELAS);
 int     measureRT(int mode = Measure::ELAS);
 

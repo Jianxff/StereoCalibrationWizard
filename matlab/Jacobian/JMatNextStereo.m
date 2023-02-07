@@ -44,7 +44,7 @@ function [A_new,C_new,B_new] = JMatNextStereo(corners,R,T,config,cdata,sdata)
             switch num_intrinsic
                 case 3
                     % intrinsic parameter part
-                    Axl = [Sl(1) / Sl(3), 1];
+                    Axl = [Sl(1) / Sl(3), 1, 0];
                     Ayl = [Sl(2) / Sl(3), 0, 1];
                     Axr = Axl;
                     Ayr = Ayl;

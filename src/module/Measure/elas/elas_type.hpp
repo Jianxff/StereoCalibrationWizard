@@ -97,8 +97,10 @@ public:
 
     void createTrackBar(){
         cv::namedWindow("ELAS ToolBox", cv::WINDOW_AUTOSIZE);
-        cv::resizeWindow("ELAS ToolBox",cv::Size(480,660));
-        _setTrackBar("support_threshold",(int)(support_threshold*100),100);
+        cv::resizeWindow("ELAS ToolBox",cv::Size(480,740));
+        _setTrackBar("disp_min",disp_min,100);
+        _setTrackBar("disp_max",disp_max,256);
+        _setTrackBar("support_threshold",(int)(support_threshold*100),150);
         _setTrackBar("support_texture",support_texture,50);
         _setTrackBar("candidate_stepsize",candidate_stepsize, 50);
         _setTrackBar("incon_window_size",incon_window_size, 50);
@@ -112,11 +114,13 @@ public:
         _setTrackBar("lr_threshold",lr_threshold, 20);
         _setTrackBar("sim_threshold",(int)(speckle_sim_threshold * 10), 200);
         _setTrackBar("speckle_size",speckle_size / 10, 50);
-        _setTrackBar("ipol_gap_width",ipol_gap_width / 100, 50);
+        _setTrackBar("ipol_gap_width",ipol_gap_width/10, 200);
     }
 
     void readTrackBar(){
         try{
+            disp_min = cv::getTrackbarPos("disp_min","ELAS ToolBox");
+            disp_max = cv::getTrackbarPos("disp_max","ELAS ToolBox");
             support_threshold = (float)cv::getTrackbarPos("support_threshold","ELAS ToolBox") / 100.0;
             support_texture = cv::getTrackbarPos("support_texture","ELAS ToolBox");
             candidate_stepsize = cv::getTrackbarPos("candidate_stepsize","ELAS ToolBox");
@@ -131,7 +135,7 @@ public:
             lr_threshold = cv::getTrackbarPos("lr_threshold","ELAS ToolBox");
             speckle_sim_threshold = (float)cv::getTrackbarPos("sim_threshold","ELAS ToolBox") / 10.0;
             speckle_size = cv::getTrackbarPos("speckle_size","ELAS ToolBox") * 10;
-            ipol_gap_width = cv::getTrackbarPos("ipol_gap_width","ELAS ToolBox") * 100;
+            ipol_gap_width = cv::getTrackbarPos("ipol_gap_width","ELAS ToolBox") * 10;
         }catch(std::exception& e){
             logging.critical(-1,"trackbar closed\n");
         }

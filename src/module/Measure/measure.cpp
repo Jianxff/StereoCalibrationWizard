@@ -8,6 +8,35 @@ Measure::Measure(Config& c){
     _filepath = c.config_path;
 }
 
+void Measure::readPoints(){
+    FileStorage fs(_filepath,FileStorage::READ);
+    if(!fs.isOpened())
+        logging.critical(-1,"configure file not found.\n");
+
+    FileNode fn = fs["select_points"];
+    if(fn.isNone() || fn.empty()){
+        logging.debug("no selected points\n");
+        return;
+    }
+    bool xy = false;
+    Point p = Point(0,0);
+    for(auto& it:fn){
+        if(!xy){
+            p.x = (int)it.real();
+            xy = true;
+        }else{
+            p.y = (int)it.real();
+            xy = false;
+            _select.emplace_back(Point(p.x,p.y));
+        }
+    }
+    if(xy){
+        _select.clear();
+        logging.error("points data incomplete\n");
+    }
+
+}
+
 double Measure::_distCount(Point p1,Point p2){
     Point3f v1 = _frame3D.at<Point3f>(p1.y,p1.x);
     Point3f v2 = _frame3D.at<Point3f>(p2.y,p2.x);
@@ -15,6 +44,7 @@ double Measure::_distCount(Point p1,Point p2){
 }
 
 
+//cv::setMouseCallback("Measurement",_onMouse,this);
 void Measure::_onMouse(int event, int x, int y, int flags, void* ustc){
     Measure* m = (Measure*)ustc;
     // limit
@@ -52,7 +82,7 @@ void Measure::drawDist(){
         double dist = _distCount(p1, p2);
         if(dist > 0 && dist < 1000){
             Point mid((p1.x + p2.x)/2,(p1.y + p2.y)/2 + 10);
-            sprintf(dist_s,"%.1f",dist);
+            sprintf(dist_s,"%.2f",dist);
             putText(_frameL_bak,dist_s,mid,FONT_HERSHEY_SIMPLEX, 0.52, CV_RGB(255,128,0),2);
         }
     }
@@ -68,20 +98,26 @@ void Measure::init(int mode){
         _sgbm_opt.read(_filepath.c_str());
         _sgbm = StereoSGBM::create(_sgbm_opt.min_disparity,_sgbm_opt.num_disparity,_sgbm_opt.SAD_window_size);
         _sgbm_opt.createTrackBar();
+    }else if(mode == ADCensus){
+        _adc_opt.read(_filepath.c_str());
+        _adc_opt.setVal(_ad_option);
+        _adc_opt.createTrackBar();
     }
     namedWindow("Measurement",cv::WINDOW_AUTOSIZE);
-    setMouseCallback("Measurement",_onMouse,this);
+    //setMouseCallback("Measurement",_onMouse,this);
 }
 
 
-void Measure::compute(cv::Mat Q_mat){
+void Measure::compute(cv::Mat& Q_mat){
     if(_mode == ELAS)
         _computeELAS();
     else if(_mode == SGBM)
         _computeSGBM();
+    else if(_mode == ADCensus)
+        _computeADCensus();
 
-    _frame3D = Mat(_frameDisp.size(),CV_32FC3);
-    reprojectImageTo3D(_frameDisp,_frame3D,Q_mat,false);
+    setMouseCallback("Measurement",_onMouse,this);
+    reprojectImageTo3D(_frameDisp,_frame3D,Q_mat);
 }
 
 
@@ -89,24 +125,31 @@ void Measure::showMeasure(){
     Mat img = Mat(_height, 2 * _width,CV_8UC3);
     Rect rect_left(0,0,_width,_height);
     Rect rect_right(_width,0,_width,_height);
+    
+    char pos_s[20];
+    sprintf(pos_s,"(%d, %d)",_on_point.x,_on_point.y);
+    cv::putText(_frameL_bak,pos_s,Point(20,20),FONT_HERSHEY_SIMPLEX, 0.52, CV_RGB(100,149,237),1);
     _frameL_bak.copyTo(img(rect_right));
 
-    if(_frameDepth.cols > 0){
+    if(_frameDispShow.cols > 0){
         Mat temp;
-        cvtColor(_frameDepth,temp,cv::COLOR_GRAY2RGB);
+        cvtColor(_frameDispShow,temp,COLOR_GRAY2RGB);
         temp.copyTo(img(rect_left));
+        //_frameColor.copyTo(img(rect_left));
     }
 
     // show
     cv::imshow("Measurement",img);
+    // if(_frameDisp.cols > 0)
+    //     cv::imshow("Disparity",_frameDisp);
 }
 
 void Measure::showEpi(){
     Mat img = cv::Mat(_height, 2 * _width,CV_8UC3);
     Rect rect_left(0,0,_width,_height);
     Rect rect_right(_width,0,_width,_height);
-    _frameL.copyTo(img(rect_right));
-    _frameR.copyTo(img(rect_left));
+    _frameL.copyTo(img(rect_left));
+    _frameR.copyTo(img(rect_right));
     for(int i = 0; i < _height; i += 48)
         cv::line(img,cv::Point(0,i),cv::Point(2 * _width,i),Scalar(0,255,0),1,8);
     // show

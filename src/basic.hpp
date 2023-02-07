@@ -7,6 +7,7 @@
 #include <string>
 #include <ctime>
 #include <windows.h>
+#include <thread>
 #include "dshow.h"
 
 // opencv
@@ -18,7 +19,10 @@
 #include <opencv2/imgproc/imgproc_c.h>
 
 // log
-#include "logging/logging.hpp"
+#include "util/logging.hpp"
+#include "util/argparse.hpp"
+
+extern ArgumentParser parser;
 
 #define KEY_ESC     27
 #define KEY_SPACE   32
