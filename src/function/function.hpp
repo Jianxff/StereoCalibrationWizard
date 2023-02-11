@@ -11,7 +11,9 @@ void    listCamera();
 int     initCalibrate();
 int     nextCalibrate();
 int     freeCalibrate(int total = 50);
-int     measure(int mode = Measure::ELAS);
-int     measureRT(int mode = Measure::ELAS);
+int     inputCalibrate();
+int     measure(int mode = Measure::ELAS, bool rt = false);
+int     measureStatic(int mode);
+int     measureRealTime(int mode);
 
 #endif

@@ -5,7 +5,7 @@ from python.log import logging
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5.QtWidgets import QRadioButton, QPushButton, QCheckBox, QLabel
+from PyQt5.QtWidgets import QRadioButton, QPushButton, QCheckBox, QLabel, QComboBox
 mode = 0
 rt = False
 
@@ -17,10 +17,6 @@ def set_sgbm():
     global mode
     mode = 1
 
-def set_adcensus():
-    global mode
-    mode = 2
-
 def set_rt(set):
     global rt
     rt = bool(set)
@@ -29,7 +25,7 @@ def show_gui():
     app = QApplication([])
     window = QWidget()
     window.setWindowTitle("Wizard")
-    window.resize(425,630)
+    window.resize(425,600)
     tool_label = QLabel("ToolBox ____________________",window)
     tool_label.move(40,20)
     list_btn = QPushButton("List",window)
@@ -51,17 +47,13 @@ def show_gui():
     calib_label = QLabel("Calibration ________________",window)
     calib_label.move(40,200)
 
-    init_btn = QPushButton("Init",window)
-    init_btn.setGeometry(40,240,100,50)
-    init_btn.clicked.connect(f_init)
+    cbox = QComboBox(window)
+    cbox.setGeometry(40,240,160,50)
+    cbox.addItems(["   init","   next","   free","   input"])
 
-    next_btn = QPushButton("Next", window)
-    next_btn.setGeometry(160,240,100,50)
-    next_btn.clicked.connect(f_next)
-
-    free_btn = QPushButton("Free",window)
-    free_btn.setGeometry(280,240,100,50)
-    free_btn.clicked.connect(f_free)
+    run_btn = QPushButton("Calibrate",window)
+    run_btn.setGeometry(220,240,160,50)
+    run_btn.clicked.connect(lambda x:f_select(cbox.currentText().strip()))
 
     matlab_label = QLabel("Matlab _____________________",window)
     matlab_label.move(40,310)
@@ -69,30 +61,32 @@ def show_gui():
     matlab_btn.setGeometry(40,350,340,50)
     matlab_btn.clicked.connect(f_matlab)
 
-    measure_label = QLabel("Measure ____________________", window)
+    measure_label = QLabel("Measurement ________________", window)
     measure_label.move(40,420)
-    measure_btn = QPushButton("Measurement",window)
-    measure_btn.setGeometry(40,460,340,50)
+    measure_btn = QPushButton("Measure",window)
+    measure_btn.setGeometry(40,460,160,50)
     global mode
     global rt
     measure_btn.clicked.connect(lambda:f_measure(mode,rt))
 
-    r_btn1 = QRadioButton("ELAS", window)
+    c_btn = QCheckBox("RealTime",window)
+    c_btn.move(230,475)
+    c_btn.stateChanged.connect(lambda x : set_rt(x))
+
+    r_btn1 = QRadioButton(" ELAS", window)
     r_btn1.move(50, 530)    
     r_btn1.setChecked(True)
     r_btn1.toggled.connect(lambda x : set_elas() if x else None)
 
-    r_btn2 = QRadioButton("SGBM", window)
-    r_btn2.move(50, 570)
+    r_btn2 = QRadioButton(" SGBM", window)
+    r_btn2.move(230, 530)
     r_btn2.toggled.connect(lambda x : set_sgbm() if x else None)
 
-    r_btn3 = QRadioButton("AD-Census", window)
-    r_btn3.move(220, 530)
-    r_btn3.toggled.connect(lambda x : set_adcensus() if x else None) 
+    # r_btn3 = QRadioButton("AD-Census", window)
+    # r_btn3.move(220, 530)
+    # # r_btn3.toggled.connect(lambda x : set_adcensus() if x else None) 
 
-    c_btn = QCheckBox("RealTime",window)
-    c_btn.move(220,570)
-    c_btn.stateChanged.connect(lambda x : set_rt(x))
+    
     
     window.show()
     app.exec_()

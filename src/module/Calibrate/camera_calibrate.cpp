@@ -100,10 +100,20 @@ double Calibrate::cameraCalibrate(){
         return -1;
     }
 
+    /* calculate std */
+    vector<vector<double>> perview;
+    perview.emplace_back(_perviewErrors(cdata[0]));
+    if (_conf.second_camera_index >= -1)
+        perview.emplace_back(_perviewErrors(cdata[1]));
+    double std = calibrateStd(perview);
+
+
+    /* rms */
     if(rms2 == 0) rms2 = rms1;  // for single camera
     double rms = sqrt((rms1 * rms1 + rms2 * rms2) / 2);
-    logging.info("calibration for camera system returned rms %.6f\n",rms);
+    logging.info("calibration for camera system returned rms %.6f with std %.6f\n",rms,std);
     rms_record.emplace_back(rms);
+    std_record.emplace_back(std);
     return rms;
 }
 
@@ -149,5 +159,45 @@ double Calibrate::_cameraCalibrate(CameraData& data){
     return data.rms;
 }
 
+/**
+ * @brief calculate perview reprojection errors
+ * 
+ * @param data 
+ * @return vector<double> 
+ */
+vector<double> Calibrate::_perviewErrors(CameraData& data){
+    vector<double> output;
+    for(int i = 0; i < data._object_buf.size(); i++){
+        vector<Point2f> projection;
+        cv::projectPoints(Mat(data._object_buf[i]),data.R_vec[i],data.T_vec[i],
+                            data.camera_matrix,data.dist_coeffs,
+                            projection);
+        double err = cv::norm(data.chessboard_buf[i],projection,CV_L2);
+        int n = (int)data._object_buf[i].size();
+        output.emplace_back(std::sqrt(err * err / n));
+    }
+    return output;
+}
 
+/**
+ * @brief calculate std
+ * 
+ * @param input 
+ * @return double 
+ */
+double Calibrate::calibrateStd(vector<vector<double>>& input){
+    if(input.size() == 0)   return 0;
+    double avg = 0, total = 0;
+    for(int i = 0; i < input.size(); i++){
+        for(int j = 0; j < input[i].size(); j++)
+            avg += input[i][j];
+        total += input[i].size();
+    }
+    avg /= total;
+    double sum = 0;
+    for(int i = 0; i < input.size(); i++)
+        for(int j = 0; j < input[i].size(); j++)
+            sum += std::pow(input[i][j] - avg, 2);
+    return std::sqrt(sum / total);
+}
 

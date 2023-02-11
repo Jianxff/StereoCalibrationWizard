@@ -36,7 +36,7 @@ double Calibrate::stereoCalibrate(){
     logging.info("stereo calibration for camera system returned rms %.6f\n",sdata.rms_ste);
     double epi = _computeEpipolarError();
     epi_record.emplace_back(epi);
-    rms_record_ste.emplace_back(sdata.rms_ste);
+    // rms_record_ste.emplace_back(sdata.rms_ste);
     return sdata.rms_ste;
 }
 

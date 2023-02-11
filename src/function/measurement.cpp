@@ -1,6 +1,11 @@
 #include "function.hpp"
 
-int measure(int mode){
+int measure(int mode, bool rt){
+    return rt ? measureRealTime(mode) : measureStatic(mode);
+}
+
+
+int measureStatic(int mode){
     logging.info("measure function\n");
 
     Config conf("../config.xml");
@@ -25,13 +30,13 @@ int measure(int mode){
         if(cv::waitKey() == KEY_ESC)    break;
         
         key = 0;
-        if(mode == Measure::ADCensus)
-            ms.compute(calib.sdata.Q_mat);
+        // if(mode == Measure::ADCensus)
+        ms.compute(calib.sdata.Q_mat);
 
         for(;key != KEY_SPACE && key != KEY_ESC;){
             key = cv::waitKey(5);
-            if(mode != Measure::ADCensus)
-                ms.compute(calib.sdata.Q_mat);
+            // if(mode != Measure::ADCensus)
+            //     ms.compute(calib.sdata.Q_mat);
                 
             ms.drawDist();
             ms.showMeasure();
@@ -49,10 +54,7 @@ int measure(int mode){
  * @param mode disparity mode
  * @return int 
  */
-int measureRT(int mode){
-    if(mode == Measure::ADCensus)
-        logging.critical(-1,"Real-Time mode isn't supported with AD-Census algorithm");
-    
+int measureRealTime(int mode){
     logging.info("real-time measure function\n");
 
     Config conf("../config.xml");

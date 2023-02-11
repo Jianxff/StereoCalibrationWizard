@@ -29,16 +29,20 @@ bool Camera::init(Config& c){
     }
     
     cap = new VideoCapture(index);
+
     int width = c.dual_sync ? c.image_size.width * 2 : c.image_size.width;
     cap->set(CAP_PROP_FRAME_WIDTH, width);
     cap->set(CAP_PROP_FRAME_HEIGHT,c.image_size.height);
     cap->set(CAP_PROP_FPS,60);
     // cap->get(CAP_PROP_FOURCC);
     if(c.mjpg)  cap->set(CAP_PROP_FOURCC,VideoWriter::fourcc('M', 'J', 'P', 'G'));
-    else        cap->set(CAP_PROP_FOURCC,VideoWriter::fourcc('Y', 'U', 'Y', '2'));
+    // else        cap->set(CAP_PROP_FOURCC,VideoWriter::fourcc('Y', 'U', 'Y', '2'));
 
     if(c.manual)
         cap->set(CAP_PROP_SETTINGS,1);
+
+    int cc = (int)cap->get(CAP_PROP_FOURCC);
+    logging.info("video 4cc '%c%c%c%c'\n",cc&0xFF, (cc>>8)&0xFF, (cc>>16)&0xFF, (cc>>24)&0xFF);
 
     return cap->isOpened();
 }

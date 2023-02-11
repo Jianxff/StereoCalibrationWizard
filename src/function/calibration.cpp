@@ -9,7 +9,6 @@ int initCalibrate(){
     cap.writeCount(0);
     calib.clearData();
 
-
     cap.openCamera();
     int res = cap.captureImage(cap.INIT_CAP | cap.MULTI_CAP | cap.DETECT | cap.SAVE_IMAGE);
     if(cap.readCount() <= 0)
@@ -20,6 +19,7 @@ int initCalibrate(){
     calib.stereoCalibrate();
     calib.storeData();
     cv::destroyAllWindows();
+    
     return res;
 }
 
@@ -34,16 +34,39 @@ int nextCalibrate(){
 
     cap.openCamera();
     int res = cap.captureImage(cap.NEXTPOSE | cap.DETECT | cap.SAVE_IMAGE);
-    cap.readCount();    
-    if(res == 0){
-        calib.readImage(cap.count);
-        calib.cameraCalibrate();
-        calib.stereoCalibrate();
-        calib.storeData();
-    }
+    cap.readCount();   
+
+    if(res == 1)
+        calib.rollBack();
+    
+    calib.readImage(cap.count);
+    calib.cameraCalibrate();
+    calib.stereoCalibrate();
+    cap.writeCount();
+    calib.storeData();
     cv::destroyAllWindows();
+    
     logging.debug("next calibrate complete\n");
+
     return res;
+}
+
+int inputCalibrate(){
+    logging.info("calibrate input images\n");
+    Config conf("../config.xml");
+    Capture cap(conf);
+    Calibrate calib(conf);
+
+    calib.importData(cap.limitCount());
+    calib.readImage(cap.count);
+    calib.cameraCalibrate();
+    calib.stereoCalibrate();
+    cap.writeCount();
+    calib.storeData();
+
+    logging.debug("calibrate for exsited images complete\n");
+
+    return 0;
 }
 
 int freeCalibrate(int total){
@@ -76,5 +99,7 @@ int freeCalibrate(int total){
         calib.stereoCalibrate();    
     }
     calib.storeData();
+    logging.debug("free calibrate complete\n");
+
     return 0;
 }

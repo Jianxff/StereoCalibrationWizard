@@ -29,6 +29,7 @@ void Capture::openCamera(){
     waitKey(1000);
 }
 
+
 void Capture::_showFrame(){
     if(_conf.main_camera_index <= -1)
         return;

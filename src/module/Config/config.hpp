@@ -14,6 +14,8 @@ public:
 
     bool manual = false;
     bool mjpg = false;
+    int magnify_origin = 10;
+    int magnify_rate = 5;
     
     /* Calibrate Parameters */
     cv::Size    board_size;

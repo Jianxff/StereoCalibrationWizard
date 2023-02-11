@@ -10,9 +10,9 @@ dist_neighbor = 20;         % smallest distance of neighboring corner points (in
 tranlation_bound = 600;     % bound of translation in optimization, may need to change for different cameras
 %cost functon control
 use_pso = 1;                % 1: use pso() function  0: use sa() function 
+fast_mode = 1;              % fast calculation in cost function
 fval_threshold = 5;         % threshold of fval
-
-round_limit = 800;         % iteration round limit
+round_limit = 800;          % iteration round limit
 
 try
     [config,cdata,sdata] = importData(xml_path);
@@ -43,11 +43,11 @@ min_fval = realmax;
 % fval_threshold = fval_threshold - (config.num_frame - 3) * 1.2;
 round_limit = round_limit - (config.num_frame - 3) * 100;
 val_count_limit = 10 - (config.num_frame - 3);
-if val_count_limit < 5
-    val_count_limit = 5;
+if val_count_limit < 3.5
+    val_count_limit = 3.5;
 end
-if fval_threshold < 5
-    fval_threshold = 5;
+if fval_threshold < 3
+    fval_threshold = 3;
 end
 
 if round_limit < 500
@@ -72,6 +72,9 @@ while round < round_limit && min_fval >= fval_threshold && val_count < val_count
     if fval < realmax
         val_count = val_count + 1;
         fprintf(1,'[R-%d] fval: %.4f\n',round,fval);
+        if fast_mode == 1
+            break;
+        end
     end
 end
 x = min_x;
@@ -79,7 +82,7 @@ fval = min_fval;
 cost_time = toc(sta);
 
 if fval > realmax/2
-    fprintf(1,'*** cost funtion time out ***\n');
+    fprintf(1,'[abort] LTE\n');
     return;
 else
     fprintf(1,'[fval] %.4f\n',fval);

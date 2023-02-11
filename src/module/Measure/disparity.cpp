@@ -75,66 +75,66 @@ void Measure::_computeSGBM(){
     cv::applyColorMap(_frameDispShow,_frameColor,COLORMAP_JET);        
 }
 
-void Measure::_computeADCensus(){
-    _adc_opt.readTrackBar();
-    _adc_opt.setVal(_ad_option);
+// void Measure::_computeADCensus(){
+//     _adc_opt.readTrackBar();
+//     _adc_opt.setVal(_ad_option);
     
-    _ad_census.Initialize(_width,_height,_ad_option);
+//     _ad_census.Initialize(_width,_height,_ad_option);
 
-    // 左右影像的彩色数据
-    auto bytes_left = new uint8[_width * _height * 3];
-    auto bytes_right = new uint8[_width * _height * 3];
-    for (int i = 0; i < _height; i++) {
-        for (int j = 0; j < _width; j++) {
-            bytes_left[i * 3 * _width + 3 * j] = _frameL.at<cv::Vec3b>(i, j)[0];
-            bytes_left[i * 3 * _width + 3 * j + 1] = _frameL.at<cv::Vec3b>(i, j)[1];
-            bytes_left[i * 3 * _width + 3 * j + 2] = _frameL.at<cv::Vec3b>(i, j)[2];
-            bytes_right[i * 3 * _width + 3 * j] = _frameR.at<cv::Vec3b>(i, j)[0];
-            bytes_right[i * 3 * _width + 3 * j + 1] = _frameR.at<cv::Vec3b>(i, j)[1];
-            bytes_right[i * 3 * _width + 3 * j + 2] = _frameR.at<cv::Vec3b>(i, j)[2];
-        }
-    }
+//     // 左右影像的彩色数据
+//     auto bytes_left = new uint8[_width * _height * 3];
+//     auto bytes_right = new uint8[_width * _height * 3];
+//     for (int i = 0; i < _height; i++) {
+//         for (int j = 0; j < _width; j++) {
+//             bytes_left[i * 3 * _width + 3 * j] = _frameL.at<cv::Vec3b>(i, j)[0];
+//             bytes_left[i * 3 * _width + 3 * j + 1] = _frameL.at<cv::Vec3b>(i, j)[1];
+//             bytes_left[i * 3 * _width + 3 * j + 2] = _frameL.at<cv::Vec3b>(i, j)[2];
+//             bytes_right[i * 3 * _width + 3 * j] = _frameR.at<cv::Vec3b>(i, j)[0];
+//             bytes_right[i * 3 * _width + 3 * j + 1] = _frameR.at<cv::Vec3b>(i, j)[1];
+//             bytes_right[i * 3 * _width + 3 * j + 2] = _frameR.at<cv::Vec3b>(i, j)[2];
+//         }
+//     }
 
-    auto disparity = new float32[uint32(_width * _height)]();
-    int res = _ad_census.Match(bytes_left, bytes_right, disparity);
-    if(!res){
-        logging.error("ADCensus match failed.");
-        return;
-    }
+//     auto disparity = new float32[uint32(_width * _height)]();
+//     int res = _ad_census.Match(bytes_left, bytes_right, disparity);
+//     if(!res){
+//         logging.error("ADCensus match failed.");
+//         return;
+//     }
 
-    /* Convert OpenCv */
-    Mat disp_show = Mat(Size(_width,_height), CV_8UC1);
-    Mat disp_count = Mat(Size(_width,_height), CV_8UC1);
-    float32 min_disp = float32(_width), max_disp = -float32(_width);
-    for (sint32 i = 0; i < _height; i++) {
-        for (sint32 j = 0; j < _width; j++) {
-            const float32 disp = abs(disparity[i * _width + j]);
-            if (disp != Invalid_Float) {
-                min_disp = std::min(min_disp, disp);
-                max_disp = std::max(max_disp, disp);
-            }
-        }
-    }
-    for (sint32 i = 0; i < _height; i++) {
-        for (sint32 j = 0; j < _width; j++) {
-            const float32 disp = abs(disparity[i * _width + j]);
-            if (disp == Invalid_Float)
-                disp_show.data[i * _width + j] = disp_count.data[i * _width + j] = 0;
-            else{ 
-                disp_show.data[i * _width + j] = static_cast<uchar>((disp - min_disp) / (max_disp - min_disp) * 255);
-                disp_count.data[i * _width + j] = disp;
-            }
-        }
-    }
+//     /* Convert OpenCv */
+//     Mat disp_show = Mat(Size(_width,_height), CV_8UC1);
+//     Mat disp_count = Mat(Size(_width,_height), CV_8UC1);
+//     float32 min_disp = float32(_width), max_disp = -float32(_width);
+//     for (sint32 i = 0; i < _height; i++) {
+//         for (sint32 j = 0; j < _width; j++) {
+//             const float32 disp = abs(disparity[i * _width + j]);
+//             if (disp != Invalid_Float) {
+//                 min_disp = std::min(min_disp, disp);
+//                 max_disp = std::max(max_disp, disp);
+//             }
+//         }
+//     }
+//     for (sint32 i = 0; i < _height; i++) {
+//         for (sint32 j = 0; j < _width; j++) {
+//             const float32 disp = abs(disparity[i * _width + j]);
+//             if (disp == Invalid_Float)
+//                 disp_show.data[i * _width + j] = disp_count.data[i * _width + j] = 0;
+//             else{ 
+//                 disp_show.data[i * _width + j] = static_cast<uchar>((disp - min_disp) / (max_disp - min_disp) * 255);
+//                 disp_count.data[i * _width + j] = disp;
+//             }
+//         }
+//     }
     
-    //disp_show.convertTo(_frameDisp,CV_32F);
-    disp_show.copyTo(_frameDispShow);
-    disp_count.convertTo(_frameDisp,CV_32F);
-    // disp_show.convertTo(_frameDisp,CV_32F);
-    // depth
-    // normalize(disp,_frameDepth,0,255,cv::NORM_MINMAX,CV_8U);
-    applyColorMap(disp_show,_frameColor,COLORMAP_JET);
-    delete disparity;
-    delete bytes_left;
-    delete bytes_right;
-}
+//     //disp_show.convertTo(_frameDisp,CV_32F);
+//     disp_show.copyTo(_frameDispShow);
+//     disp_count.convertTo(_frameDisp,CV_32F);
+//     // disp_show.convertTo(_frameDisp,CV_32F);
+//     // depth
+//     // normalize(disp,_frameDepth,0,255,cv::NORM_MINMAX,CV_8U);
+//     applyColorMap(disp_show,_frameColor,COLORMAP_JET);
+//     delete disparity;
+//     delete bytes_left;
+//     delete bytes_right;
+// }

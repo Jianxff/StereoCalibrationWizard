@@ -13,13 +13,16 @@
     <manual_settings>0</manual_settings>
     <!-- MJPG 压缩 -->
     <compress_mjpg>0</compress_mjpg>
+    <!-- 选点放大参数 -->
+    <magnify_origin>10</magnify_origin>
+    <magnify_rate>10</magnify_rate>
 
     <!-- 大于等于0: 设备id | -1: 从文件导入 | -2: 禁用-->
-    <main_camera_index>1</main_camera_index>
-    <second_camera_index>1</second_camera_index>
+    <main_camera_index>-1</main_camera_index>
+    <second_camera_index>-1</second_camera_index>
     
     <!-- 自动捕获: 实际画面数值与引导数值的差值范围 --> 
-    <auto_capture_range>5.0</auto_capture_range>
+    <auto_capture_range>4.0</auto_capture_range>
     <free_cap_num>30</free_cap_num>
 
     <flag_fix_aspect_ratio>1</flag_fix_aspect_ratio>

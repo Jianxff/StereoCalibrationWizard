@@ -23,6 +23,21 @@
 ## UPDATE ##
 **ON UPDATING ..**
 
+**2023/2/11**
+  - **C++**
+    - add *`magnify`* while selecting points in function `measurement`
+
+**2023/2/10**
+  - **C++**
+    - remove *`AD-Census`* stereo-match algorithm, which got bad match result and had low speed
+    - add function *`inputCalibrate()`* for calibration input images from `data/images`, which is controlled by `data/images/count.txt`
+    - add compress for video capture with choices of *`MJPG`* and *`YUY2`* (warning: *`MJPG`* will cause stuck while exiting the program on *`opencv 4`*)
+  - **Matlab**
+    - add `fast-mode` for get guidance of next position with fewer time (effective on few input images)
+  - **Python**
+    - remove *`AD-Census`* radio button
+  
+
 **2023/2/7**
   - **C++**
     - sync-frame camera supported

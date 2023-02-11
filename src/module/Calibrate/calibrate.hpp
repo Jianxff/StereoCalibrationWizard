@@ -40,23 +40,27 @@ class Calibrate{
     bool    _readImage(CameraData&);
     double  _cameraCalibrate(CameraData&);
     double  _computeEpipolarError();
+    std::vector<double> _perviewErrors(CameraData&);
     int     _count;
 
 public:
     std::vector<CameraData>     cdata;
     StereoData                  sdata;
 
+    std::vector<double>         std_record;
     std::vector<double>         rms_record;
-    std::vector<double>         rms_record_ste;
+    // std::vector<double>         rms_record_ste;
     std::vector<double>         epi_record;
     
     Calibrate(Config&);
     void    clearData();
+    void    rollBack();
     void    importData(int limit = INT_MAX);
     void    setCount(int count);        
     bool    readImage(int count);       
     double  cameraCalibrate();
     double  stereoCalibrate();
+    double  calibrateStd(std::vector<std::vector<double>>&);
     void    stereoRectify(cv::Mat& frameL, cv::Mat& frameR, bool to_file = false,
                         cv::Mat* outframeL = nullptr, cv::Mat* outframeR = nullptr);
     void    storeData();

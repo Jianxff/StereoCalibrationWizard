@@ -69,6 +69,17 @@ void Calibrate::clearData(){
     }
 }
 
+void Calibrate::rollBack(){
+    std_record.pop_back();
+    rms_record.pop_back();
+    epi_record.pop_back();
+    for(auto& cd : cdata){
+        cd._F_rec.pop_back();
+        cd._K1_rec.pop_back();
+        cd._K2_rec.pop_back();
+    }
+}
+
 void Calibrate::importData(int limit){
     if(limit < 0)
         return;
@@ -106,10 +117,16 @@ void Calibrate::importData(int limit){
             }else
                 logging.debug("no record for stereo camera system\n");
         
-            FileNode fn3 = fn0["rms_ste"];
-            if(!fn3.isNone() && !fn3.empty()){
+            // FileNode fn3 = fn0["rms_ste"];
+            // if(!fn3.isNone() && !fn3.empty()){
+            //     for(auto& it:fn3)
+            //         (++c3 <= limit) && rms_record_ste.emplace_back(it.real());
+            // }
+
+            FileNode fn3 = fn0["std"];
+                        if(!fn3.isNone() && !fn3.empty()){
                 for(auto& it:fn3)
-                    (++c3 <= limit) && rms_record_ste.emplace_back(it.real());
+                    (++c3 <= limit) && std_record.emplace_back(it.real());
             }
         }
     }
@@ -141,7 +158,7 @@ void Calibrate::storeData(){
     ofstream fout(_conf.storage_path + "/output/stereo.txt",ios::out);
     if(_conf.second_camera_index >= -1){
             fs << "stereo" << "{";
-            fs << "rms" << sdata.rms_ste;
+            fs << "rms" << sdata.rms;
             fs << "epi" << sdata.epi_error;
             fs << "R" << sdata.R_mat;
             fs << "T" << sdata.T_mat;
@@ -156,8 +173,9 @@ void Calibrate::storeData(){
     fout.close();
 
     fs << "record" << "{";
-        fs << "rms_ste" << rms_record_ste;
+        // fs << "rms_ste" << rms_record_ste;
         fs << "rms" << rms_record;
+        fs << "std" << std_record;
         fs << "epi" << epi_record;
         for(auto& cam : cdata){
             string tag = cam.primary ? "primary" : "secondary";

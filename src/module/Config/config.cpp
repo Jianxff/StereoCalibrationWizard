@@ -23,6 +23,8 @@ void Config::import(const char* filepath){
     fs["image_height"] >> image_size.height;
     fs["manual_settings"] >> manual;
     fs["compress_mjpg"] >> mjpg;
+    fs["magnify_origin"] >> magnify_origin;
+    fs["magnify_rate"] >> magnify_rate;
 
     fs["main_camera_index"] >> main_camera_index;
     fs["second_camera_index"] >> second_camera_index;

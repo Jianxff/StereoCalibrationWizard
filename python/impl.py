@@ -5,26 +5,17 @@ from python.plot import f_plot
 from python.log import logging
 eng = None
 
+def f_select(function):
+    res = os.system(f'cd bin && StereoCalibrationWizard.exe -f {function}')
+    logging.info(f'{function} calibrate return [{res}]')
+    if function == "next" or function == "free":
+        f_plot()
+    if function == "next" or function == "init":
+        if res == 0:
+            f_matlab() 
+
 def f_list():
     os.system('cd bin && StereoCalibrationWizard.exe -f list')
-
-def f_init():
-    res = os.system('cd bin && StereoCalibrationWizard.exe -f init')
-    logging.info('initialize return [%d]',res)
-    if res == 0:
-        f_matlab()
-
-def f_next():
-    res = os.system('cd bin && StereoCalibrationWizard.exe -f next')
-    logging.info('next capture return [%d]',res)
-    if res == 0:
-        f_plot(show=False)
-        f_matlab()
-
-def f_free():
-    res = os.system('cd bin && StereoCalibrationWizard.exe -f free')
-    logging.info('free capture return [%d]',res)
-    f_plot()
 
 
 def f_measure(mode,rt):

@@ -6,6 +6,9 @@ Measure::Measure(Config& c){
     _width = c.image_size.width;
     _height = c.image_size.height;
     _filepath = c.config_path;
+
+    _magnify_origin = c.magnify_origin;
+    _magnify_rate = c.magnify_rate;
 }
 
 void Measure::readPoints(){
@@ -47,12 +50,14 @@ double Measure::_distCount(Point p1,Point p2){
 //cv::setMouseCallback("Measurement",_onMouse,this);
 void Measure::_onMouse(int event, int x, int y, int flags, void* ustc){
     Measure* m = (Measure*)ustc;
+    m->_frame_magnify = Mat();
     // limit
     x -= m->_width;
-    if(x < 0 || x > m->_width || y < 0 || y > m->_width){
+    if(x < 0 || x >= m->_width || y < 0 || y >= m->_height){
         m->_on_point = Point(-1,-1);
         return;
     }
+    /* point select */
     m->_on_point = Point(x, y);
     if(event == EVENT_RBUTTONDBLCLK){       // mid button
         m->_select.clear();
@@ -68,6 +73,26 @@ void Measure::_onMouse(int event, int x, int y, int flags, void* ustc){
         logging.debug("click on (%d, %d)\n",x,y);
         m->_select.emplace_back(Point(x,y));
     }
+
+
+    /* image magnify*/
+    int start_x = x - m->_magnify_origin, start_y = y - m->_magnify_origin;
+    int size_left,size_right,size_top,size_bottom;
+    size_left = size_right = size_top = size_bottom = m->_magnify_origin;
+
+    if(start_x < 0)                             {size_left += start_x;   start_x = 0;}
+    if(start_y < 0)                             {size_top += start_y;    start_y = 0;}
+    if(x + m->_magnify_origin >= m->_width)     {size_right = m->_width - x;}
+    if(y + m->_magnify_origin >= m->_height)    {size_bottom = m->_height - y;}
+    int center_x = x - start_x, center_y = y - start_y;
+
+    Mat img_roi = m->_frameL_bak(Rect(start_x,start_y,(size_left + size_right),(size_bottom + size_top)));
+    Mat img_magnify;
+
+    cv::resize(img_roi,img_magnify,Size(m->_magnify_rate * img_roi.cols, m->_magnify_rate * img_roi.rows), cv::INTER_NEAREST);
+    cv::line(img_magnify,Point(center_x * m->_magnify_rate, 0),Point(center_x * m->_magnify_rate, img_magnify.rows - 1),Scalar(255,255,255),1,8);
+    cv::line(img_magnify,Point(0, center_y * m->_magnify_rate),Point(img_magnify.cols - 1, center_y * m->_magnify_rate),Scalar(255,255,255),1,8);
+    img_magnify.copyTo(m->_frame_magnify);
 }
 
 
@@ -98,11 +123,12 @@ void Measure::init(int mode){
         _sgbm_opt.read(_filepath.c_str());
         _sgbm = StereoSGBM::create(_sgbm_opt.min_disparity,_sgbm_opt.num_disparity,_sgbm_opt.SAD_window_size);
         _sgbm_opt.createTrackBar();
-    }else if(mode == ADCensus){
-        _adc_opt.read(_filepath.c_str());
-        _adc_opt.setVal(_ad_option);
-        _adc_opt.createTrackBar();
     }
+    // }else if(mode == ADCensus){
+    //     _adc_opt.read(_filepath.c_str());
+    //     _adc_opt.setVal(_ad_option);
+    //     _adc_opt.createTrackBar();
+    // }
     namedWindow("Measurement",cv::WINDOW_AUTOSIZE);
     //setMouseCallback("Measurement",_onMouse,this);
 }
@@ -113,8 +139,8 @@ void Measure::compute(cv::Mat& Q_mat){
         _computeELAS();
     else if(_mode == SGBM)
         _computeSGBM();
-    else if(_mode == ADCensus)
-        _computeADCensus();
+    // else if(_mode == ADCensus)
+    //     _computeADCensus();
 
     setMouseCallback("Measurement",_onMouse,this);
     reprojectImageTo3D(_frameDisp,_frame3D,Q_mat);
@@ -136,6 +162,10 @@ void Measure::showMeasure(){
         cvtColor(_frameDispShow,temp,COLOR_GRAY2RGB);
         temp.copyTo(img(rect_left));
         //_frameColor.copyTo(img(rect_left));
+    }
+
+    if(_frame_magnify.cols > 0){
+        _frame_magnify.copyTo(img(Rect(0,0,_frame_magnify.cols,_frame_magnify.rows)));
     }
 
     // show

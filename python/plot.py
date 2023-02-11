@@ -26,7 +26,7 @@ def read_data():
         logging.critical('calib-data damaged or lost')
         return None
     
-    record['rms_ste'] = list(map(float,doc.find('rms_ste').text.split()))
+    record['std'] = list(map(float,doc.find('std').text.split()))
     record['rms'] = list(map(float,doc.find('rms').text.split()))
     record['epi'] = list(map(float,doc.find('epi').text.split())) if doc.find('epi') != None else None
     
@@ -54,13 +54,13 @@ def plot_data(data = None,show = True):
 
     x = range(data['count'] - len(data['rms']) + 1, data['count'] + 1)
     # rms/epi
-    axes[0,0].set(title='mean - rms/epi')
+    axes[0,0].set(title='mean/std - rms')
     axes[0,0].plot(x,data['rms'],label='rms',color='red')
-    if data['epi'] != None:
-        ax = axes[0,0].twinx()
-        ax.plot(x,data['epi'],label='epi',color='green',linestyle=':')
-    if data['rms_ste'] != None:
-        axes[0,0].plot(x,data['rms_ste'],label='ste',color='orange',linestyle='-.')
+    # if data['epi'] != None:
+    #     ax = axes[0,0].twinx()
+    #     ax.plot(x,data['epi'],label='epi',color='green',linestyle=':')
+    ax = axes[0,0].twinx()
+    ax.plot(x,data['std'],label='std',color='green')
     axes[0,0].legend(loc='best')
 
     for pic,key in [(axes[0,1],'F'),(axes[1,0],'K1'),(axes[1,1],'K2')]:

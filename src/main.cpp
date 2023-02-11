@@ -9,12 +9,14 @@ int main(int argc, char** argv){
 
     
     _parser.add_argument<string>("-f","--function")
-          .choices<string>({"next","init","list","free","measure"})
+          .choices<string>({"list","init","next","free","input","measure"})
+          .default_<string>("init")
           .help("calibrate function");
         
     _parser.add_argument<int>("-m","--match")
-          .choices<int>({0,1,2})
-          .help("0 - ELAS, 1 - SGBM, 2 - AD-Census");
+          .choices<int>({0,1})
+          .default_<int>(0)
+          .help("0 - ELAS, 1 - SGBM");
 
     // _parser.add_argument<int>("-pi","--primary")
     //        .default_<int>(0)
@@ -24,7 +26,6 @@ int main(int argc, char** argv){
     //        .default_<int>(-2)
     //        .help("secondary camera index");
 
-    
     _parser.add_argument<bool>("-rt","--realtime")
           .help("real-time mode");
     
@@ -39,11 +40,12 @@ int main(int argc, char** argv){
         return nextCalibrate();
     else if(func == "free")
         return freeCalibrate();
-    else if(func == "measure"){
-        int match = _parser.get_value<int>("m");
-        return _parser.get_value<bool>("rt") ? measureRT(match) : measure(match);
-    }else{
+    else if(func == "input")
+        return inputCalibrate();
+    else if(func == "measure")
+        return measure(_parser.get_value<int>("m"), _parser.get_value<bool>("rt"));
+    else
         return 1;
-    }
+
     return 0;
 }
