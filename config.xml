@@ -15,7 +15,6 @@
     <compress_mjpg>0</compress_mjpg>
     <!-- 选点放大参数 -->
     <magnify_origin>10</magnify_origin>
-    <magnify_rate>10</magnify_rate>
 
     <!-- 大于等于0: 设备id | -1: 从文件导入 | -2: 禁用-->
     <main_camera_index>-1</main_camera_index>
