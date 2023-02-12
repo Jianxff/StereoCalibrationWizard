@@ -13,7 +13,6 @@ class Measure{
     int _width,_height;
     int _mode;
     int _magnify_origin;
-    int _magnify_rate;
     std::string _filepath;
     /* SGBM */
     SGBMOption _sgbm_opt;

@@ -8,7 +8,6 @@ Measure::Measure(Config& c){
     _filepath = c.config_path;
 
     _magnify_origin = c.magnify_origin;
-    _magnify_rate = c.magnify_rate;
 }
 
 void Measure::readPoints(){
@@ -74,6 +73,15 @@ void Measure::_onMouse(int event, int x, int y, int flags, void* ustc){
         m->_select.emplace_back(Point(x,y));
     }
 
+    /* image magnify rate*/
+    if(event == cv::EVENT_MOUSEWHEEL){
+        double val = cv::getMouseWheelDelta(flags);
+        m->_magnify_origin += (val < 0 ? 1 : -1);
+        // logging.debug("mouse wheel : %f\n",val);
+        if(m->_magnify_origin > 40) m->_magnify_origin = 40;
+        if(m->_magnify_origin < 5)  m->_magnify_origin = 5;
+    }
+
 
     /* image magnify*/
     int start_x = x - m->_magnify_origin, start_y = y - m->_magnify_origin;
@@ -89,9 +97,11 @@ void Measure::_onMouse(int event, int x, int y, int flags, void* ustc){
     Mat img_roi = m->_frameL_bak(Rect(start_x,start_y,(size_left + size_right),(size_bottom + size_top)));
     Mat img_magnify;
 
-    cv::resize(img_roi,img_magnify,Size(m->_magnify_rate * img_roi.cols, m->_magnify_rate * img_roi.rows), cv::INTER_NEAREST);
-    cv::line(img_magnify,Point(center_x * m->_magnify_rate, 0),Point(center_x * m->_magnify_rate, img_magnify.rows - 1),Scalar(255,255,255),1,8);
-    cv::line(img_magnify,Point(0, center_y * m->_magnify_rate),Point(img_magnify.cols - 1, center_y * m->_magnify_rate),Scalar(255,255,255),1,8);
+    double rate = 80. / (double)m->_magnify_origin;
+
+    cv::resize(img_roi,img_magnify,Size(rate * img_roi.cols, rate * img_roi.rows), cv::INTER_NEAREST);
+    cv::line(img_magnify,Point(center_x * rate, 0),Point(center_x * rate, img_magnify.rows - 1),Scalar(255,255,255),1,8);
+    cv::line(img_magnify,Point(0, center_y * rate),Point(img_magnify.cols - 1, center_y * rate),Scalar(255,255,255),1,8);
     img_magnify.copyTo(m->_frame_magnify);
 }
 

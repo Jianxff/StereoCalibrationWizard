@@ -23,6 +23,10 @@
 ## UPDATE ##
 **ON UPDATING ..**
 
+**2023/2/12**
+  - **C++**
+    - add *`mousewheel`* option to control magnify rate
+
 **2023/2/11**
   - **C++**
     - add *`magnify`* while selecting points in function `measurement`
