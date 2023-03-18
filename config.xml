@@ -20,8 +20,8 @@
     <main_camera_index>-1</main_camera_index>
     <second_camera_index>-1</second_camera_index>
     
-    <!-- 自动捕获: 实际画面数值与引导数值的差值范围 --> 
-    <auto_capture_range>4.0</auto_capture_range>
+    <!-- 自动捕获: 实际画面点与引导点的差值范围 --> 
+    <auto_capture_range>6.0</auto_capture_range>
     <free_cap_num>30</free_cap_num>
 
     <flag_fix_aspect_ratio>1</flag_fix_aspect_ratio>
@@ -74,13 +74,5 @@
         <disp_max_diff>100</disp_max_diff>                  <!--16 -->
         <fill_blank>0</fill_blank>                          <!--0 -->
     </sgbm>
-
-    <adcensus>
-        <min_disparity>0</min_disparity>
-        <max_disparity>96</max_disparity>
-        <lrcheck_thres>1</lrcheck_thres>
-        <do_lrcheck>1</do_lrcheck>
-        <do_filling>1</do_filling>
-    </adcensus>
 
 </opencv_storage>

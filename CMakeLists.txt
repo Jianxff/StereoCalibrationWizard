@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(EXECUTABLE_OUTPUT_PATH ../../)
 
 # add OpenCV library
-set(OpenCV_DIR D:/.env/opencv4.7/build/x64/vc16/lib)
+set(OpenCV_DIR D:/.env/opencv4.6/build/x64/vc15/lib)
 find_package( OpenCV REQUIRED )
 
 # add source files

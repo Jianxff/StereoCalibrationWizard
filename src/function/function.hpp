@@ -5,6 +5,7 @@
 #include "../module/Capture/capture.hpp"
 #include "../module/Calibrate/calibrate.hpp"
 #include "../module/Measure/measure.hpp"
+#include "../util/timer.hpp"
 
 
 void    listCamera();

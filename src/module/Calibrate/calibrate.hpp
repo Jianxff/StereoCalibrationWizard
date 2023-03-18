@@ -51,6 +51,7 @@ public:
     std::vector<double>         rms_record;
     // std::vector<double>         rms_record_ste;
     std::vector<double>         epi_record;
+    std::vector<double>         timer_record;
     
     Calibrate(Config&);
     void    clearData();
@@ -63,6 +64,7 @@ public:
     double  calibrateStd(std::vector<std::vector<double>>&);
     void    stereoRectify(cv::Mat& frameL, cv::Mat& frameR, bool to_file = false,
                         cv::Mat* outframeL = nullptr, cv::Mat* outframeR = nullptr);
+    void    pushbackTimer(double);
     void    storeData();
 };
 

@@ -6,9 +6,13 @@ function [Config,CameraData,StereoData] = importData(xmlpath)
     if Config.dual
         cam2 = importCameraData(Config,'secondary');
         CameraData = [cam1,cam2];
+        StereoData = importStereoData(Config);
+    else
+        StereoData = [];
     end
-    StereoData = importStereoData(Config);
     
+    % StereoData.params = stereoParameters(cam1.params,cam2.params,StereoData.R,StereoData.T);
+end    
     
 function stereo = importStereoData(config)
 
@@ -21,3 +25,5 @@ function stereo = importStereoData(config)
 
     f = sscanf(raw{3},'%*c%f%*c%f%*c%f%*c%f%*c%f%*c%f%*c%f%*c%f%*c%f%*c',[1 Inf]);
     stereo.F = reshape(f,[3,3])';
+
+end

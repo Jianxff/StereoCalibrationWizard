@@ -22,6 +22,10 @@
 
 ## UPDATE ##
 **ON UPDATING ..**
+**2023/3/18**
+  - **Matlab**
+    - reduce duplicate calculation in `cost_function` to improve calc speed
+    - modify the condition of `pso` function to accelerate the convergence speed
 
 **2023/2/12**
   - **C++**

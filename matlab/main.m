@@ -13,13 +13,14 @@ use_pso = 1;                % 1: use pso() function  0: use sa() function
 fast_mode = 1;              % fast calculation in cost function
 fval_threshold = 5;         % threshold of fval
 round_limit = 800;          % iteration round limit
+[config,cdata,sdata] = importData(xml_path);
 
-try
-    [config,cdata,sdata] = importData(xml_path);
-catch
-    fprintf(1,'data files not found or broken\n');
-    return
-end
+% try
+%    [config,cdata,sdata] = importData(xml_path);
+%catch
+%    fprintf(1,'data files not found or broken\n');
+%    return
+%end
 config.dist_border = dist_border;
 config.dist_neighbor = dist_neighbor;
 [corners,cdata] = buildPoints(config, cdata, sdata);
@@ -54,15 +55,24 @@ if round_limit < 500
     round_limit = 500;
 end
 
+if use_pso
+    fprintf(1,'using pso\n');
+else
+    fprintf(1,'using sa\n');
+end
+
 round = 0;
 fval = 0;
 val_count = 0;
+if use_pso
+    options = psooptimset('Display','off','Generations',125,'ConstrBoundary','soft')
+end
 while round < round_limit && min_fval >= fval_threshold && val_count < val_count_limit
     if use_pso
         % [x,fval,exitflag,output] = particleswarm(@(x)cost_function(x,corners,config, LEFT,RIGHT,STEREO),6,lb,ub,optimoptions('particleswarm', 'Display', 'off'));
-        [x,fval,exitflag,output] = pso(@(x)costFunction(x,corners,config,cdata,sdata),6,[],[],[],[],lb,ub,[],psooptimset('Display','off'));
+        [x,fval,exitflag,output] = pso(@(x)costFunction(x,corners,config,cdata,sdata),6,[],[],[],[],lb,ub,[],options);
     else
-        [x,fval,exitflag,output] = simulannealbnd(@(x)costFunction(x,corners,config, cdata,sdata),x,lb,ub,saoptimset('Display', 'off'));
+        [x,fval,exitflag,output] = simulannealbnd(@(x)costFunction(x,corners,config, cdata,sdata),x,lb,ub, saoptimset('Display', 'off'));
     end
     round = round + 1;
     if fval < min_fval
@@ -82,7 +92,7 @@ fval = min_fval;
 cost_time = toc(sta);
 
 if fval > realmax/2
-    fprintf(1,'[abort] LTE\n');
+    fprintf(1,'[abort] TLE\n');
     return;
 else
     fprintf(1,'[fval] %.4f\n',fval);

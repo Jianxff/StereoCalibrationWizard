@@ -92,15 +92,20 @@ void Calibrate::importData(int limit){
     for(auto& cd : cdata)
         cd.importData(fs,limit);
     
-    int c1 = 0, c2 = 0, c3 = 0;
+    int c1 = 0, c2 = 0, c3 = 0, c4 = 0;
     FileNode fn0 = fs["record"];
     if(!fn0.isNone() && !fn0.empty()){
         FileNode fn1 = fn0["rms"];
         if(!fn1.isNone() && !fn1.empty())
             for(auto& it:fn1)
                 (++c1 <= limit) && rms_record.emplace_back(it.real());
+
+        FileNode fn2 = fn0["timer"];
+        if(!fn2.isNone() && !fn2.empty())
+            for(auto& it:fn2)
+                (++c4 <= limit) && timer_record.emplace_back(it.real());
     }
-    
+
 
     if(_conf.second_camera_index >= -1){
         FileNode fn3 = fs["stereo"];
@@ -130,6 +135,10 @@ void Calibrate::importData(int limit){
             }
         }
     }
+}
+
+void Calibrate::pushbackTimer(double timer){
+    timer_record.emplace_back(timer);
 }
 
 void Calibrate::storeData(){
@@ -177,6 +186,8 @@ void Calibrate::storeData(){
         fs << "rms" << rms_record;
         fs << "std" << std_record;
         fs << "epi" << epi_record;
+        fs << "timer" << timer_record;
+
         for(auto& cam : cdata){
             string tag = cam.primary ? "primary" : "secondary";
             fs << tag << "{";
