@@ -48,10 +48,11 @@ for m = 1 : num_frame
                 case 4
                     % intrinsic parameter part
                     rl = (1 / Sl(3)) * sqrt(Sl(1) ^ 2 + Sl(2) ^ 2);
+                    rr = (1 / Sr(3)) * sqrt(Sr(1) ^ 2 + Sr(2) ^ 2);
+
                     Axl = [(1 + CL.k1 * rl ^ 2) * Sl(1)/Sl(3), 1, 0, rl ^ 2 * CL.f * (Sl(1) / Sl(3))];
                     Ayl = [(1 + CL.k1 * rl ^ 2) * Sl(2)/Sl(3), 0, 1, rl ^ 2 * CL.f * (Sl(2) / Sl(3))];
 
-                    rr = (1 / Sr(3)) * sqrt(Sr(1) ^ 2 + Sr(2) ^ 2);
                     Axr = [(1 + CR.k1 * rr ^ 2) * Sr(1)/Sr(3), 1, 0, rr ^ 2 * CR.f * (Sr(1) / Sr(3))];
                     Ayr = [(1 + CR.k1 * rr ^ 2) * Sr(2)/Sr(3), 0, 1, rr ^ 2 * CR.f * (Sr(2) / Sr(3))];
 
@@ -68,21 +69,30 @@ for m = 1 : num_frame
                 case 5
                     % intrinsic parameter part
                     rl = (1 / Sl(3)) * sqrt(Sl(1) ^ 2 + Sl(2) ^ 2);
-                    Axl = [(1 + CL.k1 * rl ^ 2 + CL.k2 * rl ^ 4) * Sl(1)/Sl(3), 1, 0, rl ^ 2 * CL.f * (Sl(1) / Sl(3)), rl ^ 4 * CL.f * (Sl(1) / Sl(3))];
-                    Ayl = [(1 + CL.k1 * rl ^ 2 + CL.k2 * rl ^ 4) * Sl(2)/Sl(3), 0, 1, rl ^ 2 * CL.f * (Sl(2) / Sl(3)), rl ^ 4 * CL.f * (Sl(2) / Sl(3))];
-
                     rr = (1 / Sr(3)) * sqrt(Sr(1) ^ 2 + Sr(2) ^ 2);
-                    Axr = [(1 + CR.k1 * rr ^ 2 + CR.k2 * rr ^ 4) * Sr(1)/Sr(3), 1, 0, rr ^ 2 * CR.f * (Sr(1) / Sr(3)), rr ^ 4 * CR.f * (Sr(1) / Sr(3))];
-                    Ayr = [(1 + CR.k1 * rr ^ 2 + CR.k2 * rr ^ 4) * Sr(2)/Sr(3), 0, 1, rr ^ 2 * CR.f * (Sr(2) / Sr(3)), rr ^ 4 * CR.f * (Sr(2) / Sr(3))];
+
+                    Ate_1 = (1 + CL.k1 * rl ^ 2 + CL.k2 * rl ^ 4);
+                    Ate_2 = (1 + CR.k1 * rr ^ 2 + CR.k2 * rr ^ 4);
+
+                    Axl = [Ate_1 * Sl(1)/Sl(3), 1, 0, rl ^ 2 * CL.f * (Sl(1) / Sl(3)), rl ^ 4 * CL.f * (Sl(1) / Sl(3))];
+                    Ayl = [Ate_1 * Sl(2)/Sl(3), 0, 1, rl ^ 2 * CL.f * (Sl(2) / Sl(3)), rl ^ 4 * CL.f * (Sl(2) / Sl(3))];
+
+                    Axr = [Ate_2 * Sr(1)/Sr(3), 1, 0, rr ^ 2 * CR.f * (Sr(1) / Sr(3)), rr ^ 4 * CR.f * (Sr(1) / Sr(3))];
+                    Ayr = [Ate_2 * Sr(2)/Sr(3), 0, 1, rr ^ 2 * CR.f * (Sr(2) / Sr(3)), rr ^ 4 * CR.f * (Sr(2) / Sr(3))];
+
+                    Cte_1 = (2 * CR.k1 + 4 * CR.k2 * rr ^ 2);
+                    Cte_2 = (CR.k1 + 2 * CR.k2 * rr ^ 2);
 
                     % stereo parameter part 
-                    Ctx = [CR.f * (1 + CR.k1 * rr ^ 2 + CR.k2 * rr ^ 4) / Sr(3) + CR.f * Sr(1) ^ 2 * (2 * CR.k1 + 4 * CR.k2 * rr ^ 2) / Sr(3) ^ 3, 2 * CR.f * Sr(1) * Sr(2) * (CR.k1 + 2 * CR.k2 * rr ^ 2) / Sr(3) ^ 3, -2 * Sr(1) * CR.f * rr ^ 2 * (CR.k1 + 2 * CR.k2 * rr ^ 2) / Sr(3) ^ 2 - Sr(1) * CR.f * (1 + CR.k1 * rr ^ 2 + CR.k2 * rr ^ 4) / Sr(3)^2];
-                    Cty = [2 * CR.f * Sr(1) * Sr(2) * (CR.k1 + 2 * CR.k2 * rr ^ 2) / Sr(3) ^ 3, CR.f * (1 + CR.k1 * rr ^ 2 + CR.k2 * rr ^ 4) / Sr(3) + CR.f * Sr(2) ^ 2 * (2 * CR.k1 + 4 * CR.k2 * rr ^ 2) / Sr(3) ^ 3, -2 * Sr(2) * CR.f * rr ^ 2 * (CR.k1 + 2 * CR.k2 * rr ^ 2) / Sr(3) ^ 2 - Sr(2) * CR.f * (1 + CR.k1 * rr ^ 2 + CR.k2 * rr ^ 4) / Sr(3)^2]; 
+                    Ctx = [CR.f * Ate_2 / Sr(3) + CR.f * Sr(1) ^ 2 * Cte_1 / Sr(3) ^ 3, 2 * CR.f * Sr(1) * Sr(2) * Cte_2 / Sr(3) ^ 3, -2 * Sr(1) * CR.f * rr ^ 2 * Cte_2 / Sr(3) ^ 2 - Sr(1) * CR.f * Ate_2 / Sr(3)^2];
+                    Cty = [2 * CR.f * Sr(1) * Sr(2) * (CR.k1 + 2 * CR.k2 * rr ^ 2) / Sr(3) ^ 3, CR.f * Ate_2 / Sr(3) + CR.f * Sr(2) ^ 2 * Cte_1 / Sr(3) ^ 3, -2 * Sr(2) * CR.f * rr ^ 2 * (CR.k1 + 2 * CR.k2 * rr ^ 2) / Sr(3) ^ 2 - Sr(2) * CR.f * Ate_2 / Sr(3)^2]; 
                      
+                    Bte_1 = (2 * CL.k1 + 4 * CL.k2 * rl ^ 2);
+                    Bte_2 = (CL.k1 + 2 * CL.k2 * rl ^ 2);
                     
                     % extrinsic parameter part
-                    Btxl = [CL.f * (1 + CL.k1 * rl ^ 2 + CL.k2 * rl ^ 4) / Sl(3) + CL.f * Sl(1) ^ 2 * (2 * CL.k1 + 4 * CL.k2 * rl ^ 2) / Sl(3) ^ 3, 2 * CL.f * Sl(1) * Sl(2) * (CL.k1 + 2 * CL.k2 * rl ^ 2) / Sl(3) ^ 3, -2 * Sl(1) * CL.f * rl ^ 2 * (CL.k1 + 2 * CL.k2 * rl ^ 2) / Sl(3) ^ 2 - Sl(1) * CL.f * (1 + CL.k1 * rl ^ 2 + CL.k2 * rl ^ 4) / Sl(3)^2];
-                    Btyl = [2 * CL.f * Sl(1) * Sl(2) * (CL.k1 + 2 * CL.k2 * rl ^ 2) / Sl(3) ^ 3, CL.f * (1 + CL.k1 * rl ^ 2 + CL.k2 * rl ^ 4) / Sl(3) + CL.f * Sl(2) ^ 2 * (2 * CL.k1 + 4 * CL.k2 * rl ^ 2) / Sl(3) ^ 3, -2 * Sl(2) * CL.f * rl ^ 2 * (CL.k1 + 2 * CL.k2 * rl ^ 2) / Sl(3) ^ 2 - Sl(2) * CL.f * (1 + CL.k1 * rl ^ 2 + CL.k2 * rl ^ 4) / Sl(3)^2]; 
+                    Btxl = [CL.f * Ate_1 / Sl(3) + CL.f * Sl(1) ^ 2 * Bte_1 / Sl(3) ^ 3, 2 * CL.f * Sl(1) * Sl(2) * Bte_2 / Sl(3) ^ 3, -2 * Sl(1) * CL.f * rl ^ 2 * Bte_2 / Sl(3) ^ 2 - Sl(1) * CL.f * Ate_1 / Sl(3)^2];
+                    Btyl = [2 * CL.f * Sl(1) * Sl(2) * Bte_2 / Sl(3) ^ 3, CL.f * Ate_1 / Sl(3) + CL.f * Sl(2) ^ 2 * Bte_1 / Sl(3) ^ 3, -2 * Sl(2) * CL.f * rl ^ 2 * Bte_2 / Sl(3) ^ 2 - Sl(2) * CL.f * Ate_1 / Sl(3)^2]; 
                     Btxr = Ctx;
                     Btyr = Cty;
             end

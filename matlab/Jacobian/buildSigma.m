@@ -1,4 +1,4 @@
-function out = traceCount(corners,P,R,T,config,cdata,sdata)
+function out = buildSigma(corners,P,R,T,config,cdata,sdata)
 
 board_width = config.board_width;
 board_height = config.board_height;
@@ -31,17 +31,17 @@ if length(cdata) == 2
     W = M(1:num_intr,num_intr+1:end);
     V = M(num_intr+1:end,num_intr+1:end); 
 
-    out = trace(inv(U- W *inv(V)*W'));
+    out = inv(U- W *inv(V)*W');
 
 else
     A = config.A_part;
     B = config.B_part;
 
     ACMat = config.ACMat_extend;
-    P = P(:,:,1);
 
     %% Build Jacobian for the next pose
-    [A_new,B_new] = JMatNext(corners,R,T,config,cdata,sdata);
+    [A_new,B_new] = JMatNext(corners,R,T,config,cdata);
+
     A = [A;A_new];
     B = [B, zeros(size(B,1),6);zeros(2*board_width*board_height,size(B,2)), B_new];
     J = sparse([A,B]);
@@ -50,12 +50,12 @@ else
     ACMat (end-size(ACMat_new,1)+1 : end, end-size(ACMat_new,1)+1 : end) = ACMat_new;
     M = J' * sparse(ACMat)* J;
 
-    num_intr = config.intr_num;
+    num_intr = config.intr_num * 2;
 
     U = M(1:num_intr,1:num_intr);
     W = M(1:num_intr,num_intr+1:end);
     V = M(num_intr+1:end,num_intr+1:end); 
 
-    out = trace(inv(U- W *inv(V)*W'));
+    out = inv(U- W *inv(V)*W');
 
 end

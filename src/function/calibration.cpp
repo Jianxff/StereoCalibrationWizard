@@ -99,7 +99,7 @@ int inputCalibrate(){
 
 int freeCalibrate(int total){
     logging.info("start free capture\n");
-    initCalibrate();
+    // initCalibrate();
     
     Config conf("../config.xml");
     Capture cap(conf);

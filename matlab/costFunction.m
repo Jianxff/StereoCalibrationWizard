@@ -70,7 +70,8 @@ function out = costFunction(par,corners,config,cdata,sdata)
         end
     end
     
-    tr = traceCount(corners,P,R,t,config,cdata,sdata);
+    Sigma = buildSigma(corners,P,R,t,config,cdata,sdata);
+    tr = trace(Sigma);
 
     % relatice_dist count
     min_dist = realmax;

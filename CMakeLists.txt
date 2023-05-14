@@ -1,6 +1,6 @@
 set(PROJECT_NAME StereoCalibrationWizard)
 project(${PROJECT_NAME})
-cmake_minimum_required(VERSION 3.22)
+# cmake_minimum_required(VERSION 3.22)
 set(CMAKE_CXX_STANDARD 17)
 
 set(EXECUTABLE_OUTPUT_PATH ../../)

@@ -218,7 +218,7 @@ int Capture::readCount(){
 
 int Capture::limitCount(){
     readCount();
-    return count - count_free + 1;
+    return count - count_free;
 }
 
 void Capture::writeCount(int count_input){

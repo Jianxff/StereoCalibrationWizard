@@ -22,7 +22,7 @@
     
     <!-- 自动捕获: 实际画面点与引导点的差值范围 --> 
     <auto_capture_range>6.0</auto_capture_range>
-    <free_cap_num>30</free_cap_num>
+    <free_cap_num>50</free_cap_num>
 
     <flag_fix_aspect_ratio>1</flag_fix_aspect_ratio>
     <flag_zero_tangent_dist>1</flag_zero_tangent_dist>

@@ -14,7 +14,7 @@ if length(cdata) == 2
     config_new.B_part = B_part;
 
 else
-    [A_part,B_part] = JMat(corners,config,cdata,sdata);
+    [A_part,B_part] = JMat(corners,config,cdata);
     ACMat_extend = zeros(size(ACMat) + [2*board_height*board_width,2*board_height*board_width]);
     config_new.A_part = A_part;
     config_new.B_part = B_part;

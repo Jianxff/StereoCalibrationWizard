@@ -1,5 +1,4 @@
-function [A,B] = JMat(corners,config,cdata,sdata)
-
+function [A,B] = JMat(corners,config,cdata)
     board_width = config.board_width;
     board_height = config.board_height;
     num_frame = config.num_frame;
@@ -18,7 +17,7 @@ function [A,B] = JMat(corners,config,cdata,sdata)
                 Q = corners(:, j + (i - 1) * board_width);
                 S = CD.R(:,:,m) * Q + CD.T(:,m); 
                 r = (1 / S(3)) * sqrt(S(1) ^ 2 + S(2) ^ 2);
-
+                
                 dSdr = CD.R(:,:,m) * [Q(1)  Q(3) -Q(2);
                                      -Q(3)  Q(2)  Q(1);
                                       Q(2) -Q(1)  Q(3)];

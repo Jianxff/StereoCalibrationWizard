@@ -13,14 +13,10 @@ use_pso = 1;                % 1: use pso() function  0: use sa() function
 fast_mode = 1;              % fast calculation in cost function
 fval_threshold = 5;         % threshold of fval
 round_limit = 800;          % iteration round limit
+pixel_gap = 10;             % pixel gap between neighboring points
 [config,cdata,sdata] = importData(xml_path);
 
-% try
-%    [config,cdata,sdata] = importData(xml_path);
-%catch
-%    fprintf(1,'data files not found or broken\n');
-%    return
-%end
+
 config.dist_border = dist_border;
 config.dist_neighbor = dist_neighbor;
 [corners,cdata] = buildPoints(config, cdata, sdata);
@@ -105,7 +101,15 @@ fprintf(1,'[round] %d\n[time] %.6f\n',round,cost_time);
 
 plotNext( config, Next,'primary');
 writePoints(config, Next, [config.storage_path,'/next/primary.txt'])
+
 if length(cdata) == 2
     plotNext(config, NextR, 'secondary');
     writePoints(config, NextR, [config.storage_path,'/next/secondary.txt'])
+end
+
+if length(cdata) == 1
+    plotUMap(x,corners,config,Next,[],cdata,sdata,pixel_gap)
+end
+if length(cdata) == 2
+    plotUMap(x,corners,config,Next,NextR,cdata,sdata,pixel_gap)
 end

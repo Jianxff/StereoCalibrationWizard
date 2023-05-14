@@ -1,25 +1,10 @@
-function [A_new,B_new] = JMatNext(corners,R,T,config,cdata,sdata)
+function [A_new,B_new] = JMatNext(corners,R,T,config,cdata)
 
     board_width = config.board_width;
     board_height = config.board_height;
-    CD = cdata(1);
+    CD = cdata;
     num_intrinsic = CD.intr_num;
 
-    
-    % if isempty(R)
-    %     x = T;
-    %     Rx = [1 0 0;
-    %           0 cos(x(1)) -sin(x(1));    
-    %           0 sin(x(1)) cos(x(1))];
-    %     Ry = [cos(x(2)) 0 sin(x(2));
-    %           0 1 0;
-    %           -sin(x(2)) 0 cos(x(2))];
-    %     Rz = [cos(x(3)) -sin(x(3)) 0;
-    %           sin(x(3)) cos(x(3)) 0;
-    %           0 0 1];
-    %     R = Rz * Ry * Rx; % Rotation matrix in the next frame
-    %     T = x(4:6)';
-    % end
     
     %% Build Jacobian for the next pose
     A_new = zeros(2 * board_width * board_height,num_intrinsic); % 2n * k
@@ -57,12 +42,17 @@ function [A_new,B_new] = JMatNext(corners,R,T,config,cdata,sdata)
                 case 5
                     % intrinsic parameter part
                     r = (1 / S(3)) * sqrt(S(1) ^ 2 + S(2) ^ 2);
-                    Ax = [(1 + CD.k1 * r ^ 2 + CD.k2 * r ^ 4) * S(1)/S(3), 1, 0, r ^ 2 * CD.f * (S(1) / S(3)), r ^ 4 * CD.f * (S(1) / S(3))];
-                    Ay = [(1 + CD.k1 * r ^ 2 + CD.k2 * r ^ 4) * S(2)/S(3), 0, 1, r ^ 2 * CD.f * (S(2) / S(3)), r ^ 4 * CD.f * (S(2) / S(3))];
+
+                    Ate_1 = (1 + CD.k1 * r ^ 2 + CD.k2 * r ^ 4);
+                    Ate_2 = (CD.k1 + 2 * CD.k2 * r ^ 2);
+                    Ate_3 = (2 * CD.k1 + 4 * CD.k2 * r ^ 2);
+
+                    Ax = [Ate_1 * S(1)/S(3), 1, 0, r ^ 2 * CD.f * (S(1) / S(3)), r ^ 4 * CD.f * (S(1) / S(3))];
+                    Ay = [Ate_1 * S(2)/S(3), 0, 1, r ^ 2 * CD.f * (S(2) / S(3)), r ^ 4 * CD.f * (S(2) / S(3))];
 
                     % extrinsic parameter part
-                    Btx = [CD.f * (1 + CD.k1 * r ^ 2 + CD.k2 * r ^ 4) / S(3) + CD.f * S(1) ^ 2 * (2 * CD.k1 + 4 * CD.k2 * r ^ 2) / S(3) ^ 3, 2 * CD.f * S(1) * S(2) * (CD.k1 + 2 * CD.k2 * r ^ 2) / S(3) ^ 3, -2 * S(1) * CD.f * r ^ 2 * (CD.k1 + 2 * CD.k2 * r ^ 2) / S(3) ^ 2 - S(1) * CD.f * (1 + CD.k1 * r ^ 2 + CD.k2 * r ^ 4) / S(3)^2];
-                    Bty = [2 * CD.f * S(1) * S(2) * (CD.k1 + 2 * CD.k2 * r ^ 2) / S(3) ^ 3, CD.f * (1 + CD.k1 * r ^ 2 + CD.k2 * r ^ 4) / S(3) + CD.f * S(2) ^ 2 * (2 * CD.k1 + 4 * CD.k2 * r ^ 2) / S(3) ^ 3, -2 * S(2) * CD.f * r ^ 2 * (CD.k1 + 2 * CD.k2 * r ^ 2) / S(3) ^ 2 - S(2) * CD.f * (1 + CD.k1 * r ^ 2 + CD.k2 * r ^ 4) / S(3)^2]; 
+                    Btx = [CD.f * Ate_1 / S(3) + CD.f * S(1) ^ 2 * Ate_3 / S(3) ^ 3, 2 * CD.f * S(1) * S(2) * Ate_2 / S(3) ^ 3, -2 * S(1) * CD.f * r ^ 2 * Ate_2 / S(3) ^ 2 - S(1) * CD.f * Ate_1 / S(3)^2];
+                    Bty = [2 * CD.f * S(1) * S(2) * Ate_2 / S(3) ^ 3, CD.f * Ate_1 / S(3) + CD.f * S(2) ^ 2 * Ate_3 / S(3) ^ 3, -2 * S(2) * CD.f * r ^ 2 * Ate_2 / S(3) ^ 2 - S(2) * CD.f * Ate_1 / S(3)^2]; 
 
             end
 

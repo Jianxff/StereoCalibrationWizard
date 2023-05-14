@@ -5,6 +5,7 @@ bin
 python/__pycache__
 scripts/history/*
 scripts/match
+scripts/images
 
 data/images/*
 data/output/*
